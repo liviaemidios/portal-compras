@@ -32,7 +32,7 @@ def login_page():
             usuarios = carregar_usuarios()
             if usuario in usuarios.index and usuarios.loc[usuario, "senha"] == hash_senha(senha):
                 st.session_state.usuario = usuario
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Usuário ou senha incorretos.")
 
