@@ -14,61 +14,99 @@ st.set_page_config(page_title="Portal de Compras", layout="wide")
 
 if "usuario" not in st.session_state:
     st.session_state.usuario = None
+if "pagina" not in st.session_state:
+    st.session_state.pagina = None
 
 if st.session_state.usuario is None:
     login_page()
 else:
     usuario = get_current_user()
-    st.sidebar.markdown(f"**Usuário:** {usuario['nome']}")
-    pagina = st.sidebar.radio("Menu", ["👤 Meu Perfil", "🏠 Dashboard", "🏢 Fornecedores", "🚚 Distribuidoras", "📦 Produtos", "💰 Comparador de Preços", "📊 Relatórios", "🚪 Sair"])
 
-    if pagina == "🏠 Dashboard":
-        st.title("Bem-vindo ao Portal de Compras Internas")
-        st.info("Selecione uma das opções no menu à esquerda.")
+    # MENU LATERAL COM PERFIL ACIMA DO USUÁRIO
+    with st.sidebar:
+        st.markdown("### 👤 Meu Perfil")
+        if st.button("Abrir Perfil"):
+            st.session_state.pagina = "meu_perfil"
 
-    elif pagina == "🏢 Fornecedores":
-        pagina_fornecedores()
+        st.markdown(f"**Usuário:** {usuario['nome']}")
+        pagina = st.radio("Menu", [
+            "🏠 Dashboard",
+            "🏢 Fornecedores",
+            "🚚 Distribuidoras",
+            "📦 Produtos",
+            "💰 Comparador de Preços",
+            "📊 Relatórios",
+            "🚪 Sair"
+        ])
 
-    elif pagina == "🚚 Distribuidoras":
-        pagina_distribuidoras()
+    if st.session_state.pagina == "meu_perfil":
+        st.subheader("👤 Meu Perfil")
 
-    elif pagina == "📦 Produtos":
-        pagina_produtos()
-
-    elif pagina == "💰 Comparador de Preços":
-        pagina_comparador()
-
-    elif pagina == "📊 Relatórios":
-        pagina_relatorios()
-
-    elif pagina == "👤 Meu Perfil":
-        st.subheader("Meu Perfil")
         if usuario.get("foto") and os.path.exists(usuario["foto"]):
             st.image(usuario["foto"], width=150)
         else:
-            st.info("Nenhuma foto cadastrada.")
+            st.info("Nenhuma foto de perfil cadastrada.")
 
         st.markdown(f"**Nome:** {usuario['nome']}")
         st.markdown(f"**E-mail:** {usuario['email']}")
 
-        st.markdown("---")
-        st.markdown("### 📸 Atualizar Foto de Perfil")
-        nova_foto = st.file_uploader("Selecione uma imagem", type=["png", "jpg", "jpeg"])
-        if nova_foto:
-            pasta_fotos = "fotos_perfil"
-            os.makedirs(pasta_fotos, exist_ok=True)
-            caminho_foto = os.path.join(pasta_fotos, f"{st.session_state.usuario}.jpg")
-            with open(caminho_foto, "wb") as f:
-                f.write(nova_foto.getbuffer())
+        with st.form("form_perfil"):
+            cpf = st.text_input("CPF", value=usuario.get("cpf", ""))
+            rg = st.text_input("RG", value=usuario.get("rg", ""))
+            data_nasc = st.date_input("Data de Nascimento", value=pd.to_datetime(usuario.get("data_nascimento", "2000-01-01")))
+            endereco = st.text_area("Endereço", value=usuario.get("endereco", ""))
+            fixo = st.text_input("Telefone Fixo", value=usuario.get("tel_fixo", ""))
+            celular = st.text_input("Telefone Celular", value=usuario.get("tel_celular", ""))
 
-            # Atualiza CSV
-            df = pd.read_csv(CAMINHO_USUARIOS)
-            df.loc[df["usuario"] == st.session_state.usuario, "foto"] = caminho_foto
-            df.to_csv(CAMINHO_USUARIOS, index=False)
+            nova_foto = st.file_uploader("Atualizar Foto de Perfil", type=["png", "jpg", "jpeg"])
+            if st.form_submit_button("Salvar Perfil"):
+                df = pd.read_csv(CAMINHO_USUARIOS)
+                idx = df[df["usuario"] == st.session_state.usuario].index[0]
 
-            st.success("Foto de perfil atualizada com sucesso!")
-            st.rerun()
+                df.at[idx, "cpf"] = cpf
+                df.at[idx, "rg"] = rg
+                df.at[idx, "data_nascimento"] = data_nasc
+                df.at[idx, "endereco"] = endereco
+                df.at[idx, "tel_fixo"] = fixo
+                df.at[idx, "tel_celular"] = celular
+
+                if nova_foto:
+                    os.makedirs("fotos_perfil", exist_ok=True)
+                    caminho_foto = f"fotos_perfil/{st.session_state.usuario}.jpg"
+                    with open(caminho_foto, "wb") as f:
+                        f.write(nova_foto.getbuffer())
+                    df.at[idx, "foto"] = caminho_foto
+
+                df.to_csv(CAMINHO_USUARIOS, index=False)
+                st.success("Perfil atualizado com sucesso!")
+                st.session_state.pagina = None
+                st.rerun()
+
+    elif pagina == "🏠 Dashboard":
+        st.title("Bem-vindo ao Portal de Compras Internas")
+        st.info("Selecione uma das opções no menu à esquerda.")
+
+    elif pagina == "🏢 Fornecedores":
+        st.session_state.pagina = None
+        pagina_fornecedores()
+
+    elif pagina == "🚚 Distribuidoras":
+        st.session_state.pagina = None
+        pagina_distribuidoras()
+
+    elif pagina == "📦 Produtos":
+        st.session_state.pagina = None
+        pagina_produtos()
+
+    elif pagina == "💰 Comparador de Preços":
+        st.session_state.pagina = None
+        pagina_comparador()
+
+    elif pagina == "📊 Relatórios":
+        st.session_state.pagina = None
+        pagina_relatorios()
 
     elif pagina == "🚪 Sair":
         st.session_state.usuario = None
+        st.session_state.pagina = None
         st.rerun()
