@@ -42,15 +42,17 @@ def login_page():
             email = st.text_input("E-mail")
             usuario = st.text_input("Nome de usuário")
             senha = st.text_input("Senha", type="password")
-            foto = st.text_input("URL da foto de perfil (opcional)")
             if st.form_submit_button("Cadastrar"):
                 usuarios = carregar_usuarios()
                 if usuario in usuarios.index:
                     st.warning("Esse nome de usuário já está em uso.")
                 else:
-                    novo = pd.DataFrame([[usuario, hash_senha(senha), nome, email, foto]], columns=["usuario", "senha", "nome", "email", "foto"])
-                    usuarios = pd.concat([usuarios, novo])
-                    usuarios.to_csv(CAMINHO_USUARIOS)
+                    novo = pd.DataFrame(
+                        [[usuario, hash_senha(senha), nome, email, ""]],
+                        columns=["usuario", "senha", "nome", "email", "foto"]
+                    )
+                    usuarios = pd.concat([usuarios.reset_index(), novo], ignore_index=True)
+                    usuarios.to_csv(CAMINHO_USUARIOS, index=False)
                     st.success("Usuário cadastrado com sucesso! Faça login.")
 
 def get_current_user():
