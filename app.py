@@ -22,12 +22,13 @@ if st.session_state.usuario is None:
 else:
     usuario = get_current_user()
 
-    # MENU LATERAL COM PERFIL ACIMA DO USUÁRIO
+    # === SIDEBAR COM LOGO E PERFIL ===
     with st.sidebar:
+        st.image("Logo Fundo Branco.png", width=200)
+        st.markdown("---")
         st.markdown("### 👤 Meu Perfil")
         if st.button("Abrir Perfil"):
             st.session_state.pagina = "meu_perfil"
-
         st.markdown(f"**Usuário:** {usuario['nome']}")
         pagina = st.radio("Menu", [
             "🏠 Dashboard",
@@ -39,11 +40,22 @@ else:
             "🚪 Sair"
         ])
 
+    # === PERFIL DO USUÁRIO ===
     if st.session_state.pagina == "meu_perfil":
         st.subheader("👤 Meu Perfil")
 
         if usuario.get("foto") and os.path.exists(usuario["foto"]):
             st.image(usuario["foto"], width=150)
+            if st.button("🗑️ Remover Foto"):
+                try:
+                    os.remove(usuario["foto"])
+                except:
+                    pass
+                df = pd.read_csv(CAMINHO_USUARIOS)
+                df.loc[df["usuario"] == st.session_state.usuario, "foto"] = ""
+                df.to_csv(CAMINHO_USUARIOS, index=False)
+                st.success("Foto removida com sucesso.")
+                st.rerun()
         else:
             st.info("Nenhuma foto de perfil cadastrada.")
 
@@ -82,6 +94,7 @@ else:
                 st.session_state.pagina = None
                 st.rerun()
 
+    # === PÁGINAS DO MENU ===
     elif pagina == "🏠 Dashboard":
         st.title("Bem-vindo ao Portal de Compras Internas")
         st.info("Selecione uma das opções no menu à esquerda.")
@@ -105,6 +118,12 @@ else:
     elif pagina == "📊 Relatórios":
         st.session_state.pagina = None
         pagina_relatorios()
+
+    elif pagina == "🚪 Sair":
+        st.session_state.usuario = None
+        st.session_state.pagina = None
+        st.rerun()
+
 
     elif pagina == "🚪 Sair":
         st.session_state.usuario = None
