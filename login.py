@@ -48,7 +48,7 @@ def login_page():
                 if usuario in usuarios.index:
                     st.warning("Esse nome de usuário já está em uso.")
                 else:
-                    novo = pd.DataFrame([[usuario, hash_senha(senha), nome, email, foto]], columns=usuarios.columns)
+                    novo = pd.DataFrame([[usuario, hash_senha(senha), nome, email, foto]], columns=["usuario", "senha", "nome", "email", "foto"])
                     usuarios = pd.concat([usuarios, novo])
                     usuarios.to_csv(CAMINHO_USUARIOS)
                     st.success("Usuário cadastrado com sucesso! Faça login.")
