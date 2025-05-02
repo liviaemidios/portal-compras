@@ -15,29 +15,28 @@ def pagina_produtos():
     iniciar_csv()
     df = carregar_csv(CAMINHO_ARQUIVO)
 
+    if st.button("➕ Cadastrar novo produto"):
+        st.session_state.modo_prod = "novo"
+
     busca = st.text_input("🔎 Buscar produto por nome, código ou categoria")
     if busca:
         df = df[df.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
 
     st.dataframe(df, use_container_width=True)
 
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        if st.button("➕ Cadastrar novo produto"):
-            st.session_state.modo_prod = "novo"
-    with col2:
-        if "modo_prod" in st.session_state and st.session_state.modo_prod == "novo":
-            with st.form("form_prod"):
-                st.subheader("Cadastrar Produto")
-                codigo = st.text_input("Código")
-                nome = st.text_input("Nome do Produto")
-                unidade = st.text_input("Unidade (ex: UN, CX, KG)")
-                categoria = st.text_input("Categoria")
-                marca = st.text_input("Marca")
-                if st.form_submit_button("Salvar"):
-                    novo = pd.DataFrame([[codigo, nome, unidade, categoria, marca]], columns=df.columns)
-                    df = pd.concat([df, novo], ignore_index=True)
-                    salvar_csv(CAMINHO_ARQUIVO, df)
-                    st.success("Produto cadastrado com sucesso!")
-                    st.session_state.modo_prod = None
-                    st.experimental_rerun()
+    if "modo_prod" in st.session_state and st.session_state.modo_prod == "novo":
+        with st.form("form_prod"):
+            st.subheader("Cadastrar Produto")
+            codigo = st.text_input("Código")
+            nome = st.text_input("Nome do Produto")
+            unidade = st.text_input("Unidade (ex: UN, CX, KG)")
+            categoria = st.text_input("Categoria")
+            marca = st.text_input("Marca")
+            if st.form_submit_button("Salvar"):
+                novo = pd.DataFrame([[codigo, nome, unidade, categoria, marca]], columns=df.columns)
+                df = pd.concat([df, novo], ignore_index=True)
+                salvar_csv(CAMINHO_ARQUIVO, df)
+                st.success("Produto cadastrado com sucesso!")
+                st.session_state.modo_prod = None
+                st.rerun()
+
