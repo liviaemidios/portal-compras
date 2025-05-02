@@ -16,7 +16,7 @@ if st.session_state.usuario is None:
 else:
     usuario = get_current_user()
     st.sidebar.markdown(f"**Usuário:** {usuario['nome']}")
-    pagina = st.sidebar.radio("Menu", ["🏠 Dashboard", "🏢 Fornecedores", "🚚 Distribuidoras", "📦 Produtos", "💰 Comparador de Preços", "📊 Relatórios", "👤 Meu Perfil", "🚪 Sair"])
+    pagina = st.sidebar.radio("Menu", ["👤 Meu Perfil", "🏠 Dashboard", "🏢 Fornecedores", "🚚 Distribuidoras", "📦 Produtos", "💰 Comparador de Preços", "📊 Relatórios", "🚪 Sair"])
 
     if pagina == "🏠 Dashboard":
         st.title("Bem-vindo ao Portal de Compras Internas")
@@ -38,4 +38,4 @@ else:
         st.markdown(f"**E-mail:** {usuario['email']}")
     elif pagina == "🚪 Sair":
         st.session_state.usuario = None
-        st.experimental_rerun()
+        st.rerun()
