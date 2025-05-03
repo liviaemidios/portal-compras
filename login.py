@@ -19,8 +19,9 @@ def hash_senha(senha):
 
 def carregar_usuarios():
     if os.path.exists(CAMINHO_USUARIOS):
-        df = pd.read_csv(CAMINHO_USUARIOS)
-        return df.set_index("usuario")
+        df = pd.read_csv(CAMINHO_USUARIOS, dtype=str)
+        df.set_index("usuario", inplace=True)
+        return df
     else:
         return pd.DataFrame(columns=[
             "usuario", "senha", "nome", "email", "foto"
@@ -88,18 +89,15 @@ def login_page():
                                  "data_nascimento", "endereco", "tel_fixo", "tel_celular"]
                     )
                     usuarios = pd.concat([usuarios.reset_index(), novo], ignore_index=True)
-                    usuarios.to_csv(CAMINHO_USUARIOS, index=False)
+                    usuarios.to_csv(CAMINHO_USUARIOS, index=False, encoding="utf-8")
                     st.success("Usuário cadastrado com sucesso! Faça login.")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
 def get_current_user():
     usuarios = carregar_usuarios()
-
-    # 🔍 Diagnóstico extra
     st.write("DEBUG >> session_state.usuario:", st.session_state.get("usuario"))
     st.write("DEBUG >> usuarios.index:", list(usuarios.index))
-
     if "usuario" in st.session_state and st.session_state.usuario in usuarios.index:
         return usuarios.loc[st.session_state.usuario].to_dict()
     return None
