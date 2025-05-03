@@ -23,14 +23,17 @@ def renderizar_fornecedores():
                 font-size: 12px !important;
                 padding: 0.25rem 0.5rem !important;
             }
-            .cabecalho-tabela {
+            .cabecalho-faixa {
                 background-color: #3879bd;
                 color: white;
-                padding: 6px;
-                border-radius: 5px;
-                text-align: center;
                 font-weight: bold;
                 font-size: 14px;
+                padding: 10px 8px;
+                margin-bottom: 0;
+                border-right: 1px solid #fff;
+            }
+            .cabecalho-faixa:last-child {
+                border-right: none;
             }
         </style>
     """, unsafe_allow_html=True)
@@ -87,13 +90,13 @@ def renderizar_fornecedores():
     fim = inicio + por_pagina
     fornecedores_pag = fornecedores.iloc[inicio:fim]
 
-    # Tabela
-    st.markdown("---")
-    header_cols = st.columns([3, 2, 2.5, 2.5, 2, 1])
-    headers = ["Razão Social", "Fantasia", "CNPJ", "E-mail", "Telefone", "Ações"]
-    for col, header in zip(header_cols, headers):
-        col.markdown(f"<div class='cabecalho-tabela'>{header}</div>", unsafe_allow_html=True)
+    # Cabeçalho da tabela em faixa azul contínua
+    st.markdown("<div style='display: flex;'>", unsafe_allow_html=True)
+    for largura, texto in zip([3, 2, 2.5, 2.5, 2, 1], ["Razão Social", "Fantasia", "CNPJ", "E-mail", "Telefone", "Ações"]):
+        st.markdown(f"<div class='cabecalho-faixa' style='flex: {largura};'>{texto}</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
+    # Linhas da tabela
     for _, row in fornecedores_pag.iterrows():
         col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2.5, 2.5, 2, 1])
         col1.write(row["razao_social"])
