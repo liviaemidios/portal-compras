@@ -13,12 +13,64 @@ if usuario is None:
     st.error("Erro ao carregar o usuário.")
     st.stop()
 
-# Conteúdo da página inicial
-st.sidebar.title("Menu")
-st.sidebar.markdown(f"👤 {usuario['nome']}")
-if st.sidebar.button("Sair"):
-    st.session_state.usuario = None
-    st.rerun()
+# Página ativa
+if "pagina" not in st.session_state:
+    st.session_state.pagina = "dashboard"
 
-st.title("Painel Inicial")
-st.success(f"Bem-vinda, {usuario['nome']}!")
+# Estilo do menu
+st.markdown("""
+<style>
+.sidebar-button {
+    display: block;
+    padding: 0.6rem 1rem;
+    margin: 0.3rem 0;
+    background-color: #e9f2fb;
+    border-radius: 8px;
+    color: #003366;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+.sidebar-button:hover {
+    background-color: #d8e7f9;
+    cursor: pointer;
+}
+.sidebar-button.active {
+    background-color: #3879bd;
+    color: white;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Menu lateral
+menu = {
+    "🏠 Dashboard": "dashboard",
+    "👤 Meu Perfil": "perfil",
+    "🚪 Sair": "sair"
+}
+
+with st.sidebar:
+    st.markdown(f"**Usuário:** {usuario['nome']}")
+
+    st.markdown("---")
+    for nome, valor in menu.items():
+        ativo = "active" if st.session_state.pagina == valor else ""
+        if st.button(nome):
+            st.session_state.pagina = valor
+
+# Conteúdo da página
+if st.session_state.pagina == "dashboard":
+    st.title("📊 Dashboard")
+    st.success(f"Bem-vinda, {usuario['nome']}!")
+    st.info("Este é seu painel inicial.")
+
+elif st.session_state.pagina == "perfil":
+    st.title("👤 Meu Perfil")
+    st.write(f"Nome: {usuario['nome']}")
+    st.write(f"Usuário: {st.session_state.usuario}")
+
+elif st.session_state.pagina == "sair":
+    st.session_state.usuario = None
+    st.session_state.pagina = None
+    st.rerun()
