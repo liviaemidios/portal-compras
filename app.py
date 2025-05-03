@@ -49,6 +49,14 @@ st.markdown("""
     color: white;
     font-weight: bold;
 }
+.acao-botao {
+    font-size: 1.1em;
+    padding: 2px 8px;
+    margin: 0 2px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -112,17 +120,34 @@ elif st.session_state.pagina == "fornecedores":
                     df_final = novo
                 df_final.to_csv(CAMINHO_FORNECEDORES, index=False)
                 st.success("Fornecedor cadastrado com sucesso!")
+                st.rerun()
 
     st.markdown("### 🔍 Buscar fornecedor")
     busca = st.text_input("Buscar por nome, CNPJ ou e-mail").lower()
 
     if os.path.exists(CAMINHO_FORNECEDORES):
         fornecedores = pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
+
         if busca:
             fornecedores = fornecedores[
                 fornecedores.apply(lambda row: busca in row.astype(str).str.lower().to_string(), axis=1)
             ]
-        st.dataframe(fornecedores)
+
+        for i, row in fornecedores.iterrows():
+            with st.container():
+                col1, col2, col3, col4 = st.columns([4, 3, 2, 3])
+                col1.markdown(f"**{row['nome']}**  \n📧 {row['email']}  \n📞 {row['telefone']}")
+                col2.markdown(f"CNPJ: {row['cnpj']}  \n📍 {row['endereco']}")
+                with col3:
+                    if st.button("🔍", key=f"ver_{i}", help="Visualizar detalhes"):
+                        st.info(f"Detalhes do fornecedor:\n{row.to_string()}")
+                    if st.button("✏️", key=f"edit_{i}", help="Editar (em breve)"):
+                        st.warning("Função de edição ainda não implementada.")
+                    if st.button("🗑️", key=f"del_{i}", help="Excluir"):
+                        fornecedores = fornecedores.drop(i)
+                        fornecedores.to_csv(CAMINHO_FORNECEDORES, index=False)
+                        st.success("Fornecedor excluído com sucesso.")
+                        st.rerun()
     else:
         st.info("Nenhum fornecedor cadastrado ainda.")
 
