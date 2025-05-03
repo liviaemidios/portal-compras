@@ -84,9 +84,6 @@ if st.session_state.pagina == "fornecedores":
     if busca:
         fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
 
-    if st.button("", key="novo_fornecedor", help="Cadastrar Novo Fornecedor"):
-        st.session_state.editando = -1
-
     st.markdown("### Lista de Fornecedores")
     st.markdown("| Razão Social | Fantasia | CNPJ | E-mail | Telefone | Ações |")
     st.markdown("|--------------|----------|------|--------|----------|--------|")
