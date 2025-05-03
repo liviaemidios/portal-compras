@@ -23,16 +23,22 @@ def renderizar_fornecedores():
                 font-size: 12px !important;
                 padding: 0.25rem 0.5rem !important;
             }
-            .cabecalho-faixa {
+            .cabecalho-faixa-container {
+                display: flex;
                 background-color: #3879bd;
+                border-radius: 5px;
+                margin-top: 1rem;
+            }
+            .cabecalho-faixa-item {
                 color: white;
                 font-weight: bold;
                 font-size: 14px;
                 padding: 10px 8px;
-                margin-bottom: 0;
-                border-right: 1px solid #fff;
+                text-align: center;
+                border-right: 1px solid #ffffff33;
+                flex-shrink: 0;
             }
-            .cabecalho-faixa:last-child {
+            .cabecalho-faixa-item:last-child {
                 border-right: none;
             }
         </style>
@@ -91,10 +97,16 @@ def renderizar_fornecedores():
     fornecedores_pag = fornecedores.iloc[inicio:fim]
 
     # Cabeçalho da tabela em faixa azul contínua
-    st.markdown("<div style='display: flex;'>", unsafe_allow_html=True)
-    for largura, texto in zip([3, 2, 2.5, 2.5, 2, 1], ["Razão Social", "Fantasia", "CNPJ", "E-mail", "Telefone", "Ações"]):
-        st.markdown(f"<div class='cabecalho-faixa' style='flex: {largura};'>{texto}</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("""
+        <div class='cabecalho-faixa-container'>
+            <div class='cabecalho-faixa-item' style='flex: 3;'>Razão Social</div>
+            <div class='cabecalho-faixa-item' style='flex: 2;'>Fantasia</div>
+            <div class='cabecalho-faixa-item' style='flex: 2.5;'>CNPJ</div>
+            <div class='cabecalho-faixa-item' style='flex: 2.5;'>E-mail</div>
+            <div class='cabecalho-faixa-item' style='flex: 2;'>Telefone</div>
+            <div class='cabecalho-faixa-item' style='flex: 1;'>Ações</div>
+        </div>
+    """, unsafe_allow_html=True)
 
     # Linhas da tabela
     for _, row in fornecedores_pag.iterrows():
