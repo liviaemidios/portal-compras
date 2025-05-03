@@ -22,14 +22,10 @@ if st.session_state.usuario is None:
 else:
     usuario = get_current_user()
 
-    # === SIDEBAR COM LOGO E PERFIL ===
     with st.sidebar:
-        st.image("Logo Fundo Branco.png", width=200)
-        st.markdown("---")
-        st.markdown("### 👤 Meu Perfil")
-        if st.button("Abrir Perfil"):
-            st.session_state.pagina = "meu_perfil"
         st.markdown(f"**Usuário:** {usuario['nome']}")
+        if st.button("👤 Meu Perfil"):
+            st.session_state.pagina = "meu_perfil"
         pagina = st.radio("Menu", [
             "🏠 Dashboard",
             "🏢 Fornecedores",
@@ -40,7 +36,6 @@ else:
             "🚪 Sair"
         ])
 
-    # === PERFIL DO USUÁRIO ===
     if st.session_state.pagina == "meu_perfil":
         st.subheader("👤 Meu Perfil")
 
@@ -94,8 +89,8 @@ else:
                 st.session_state.pagina = None
                 st.rerun()
 
-    # === PÁGINAS DO MENU ===
     elif pagina == "🏠 Dashboard":
+        st.image("https://i.imgur.com/mA7iFd8.png", width=200)
         st.title("Bem-vindo ao Portal de Compras Internas")
         st.info("Selecione uma das opções no menu à esquerda.")
 
@@ -118,12 +113,6 @@ else:
     elif pagina == "📊 Relatórios":
         st.session_state.pagina = None
         pagina_relatorios()
-
-    elif pagina == "🚪 Sair":
-        st.session_state.usuario = None
-        st.session_state.pagina = None
-        st.rerun()
-
 
     elif pagina == "🚪 Sair":
         st.session_state.usuario = None
