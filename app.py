@@ -93,7 +93,7 @@ else:
                     os.remove(foto)
                 except:
                     pass
-                df = pd.read_csv(CAMINHO_USUARIOS)
+                df = pd.read_csv(CAMINHO_USUARIOS, dtype=str)
                 df.loc[df["usuario"] == st.session_state.usuario, "foto"] = ""
                 df.to_csv(CAMINHO_USUARIOS, index=False)
                 st.success("Foto removida com sucesso.")
@@ -114,7 +114,7 @@ else:
 
             nova_foto = st.file_uploader("Atualizar Foto de Perfil", type=["png", "jpg", "jpeg"])
             if st.form_submit_button("Salvar Perfil"):
-                df = pd.read_csv(CAMINHO_USUARIOS)
+                df = pd.read_csv(CAMINHO_USUARIOS, dtype=str)
                 idx = df[df["usuario"] == st.session_state.usuario].index[0]
 
                 df.at[idx, "cpf"] = cpf
