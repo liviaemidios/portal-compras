@@ -61,8 +61,8 @@ def login_page():
                 st.success("Login realizado com sucesso.")
                 st.session_state.usuario = usuario
                 st.session_state.pagina = "dashboard"
-                st.experimental_set_query_params(logged="1")
-                st.experimental_rerun()
+                st.query_params["logged"] = "1"
+                st.rerun()
             else:
                 st.error("Usuário ou senha incorretos.")
 
