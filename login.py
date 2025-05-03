@@ -7,7 +7,7 @@ CAMINHO_USUARIOS = "database/usuarios.csv"
 
 def iniciar_usuarios():
     if not os.path.exists(CAMINHO_USUARIOS):
-        df = pd.DataFrame(columns=["usuario", "senha", "nome", "email", "foto"])
+        df = pd.DataFrame(columns=["usuario", "senha", "nome", "email", "foto", "cpf", "rg", "data_nascimento", "endereco", "tel_fixo", "tel_celular"])
         df.to_csv(CAMINHO_USUARIOS, index=False)
 
 def hash_senha(senha):
@@ -22,10 +22,41 @@ def carregar_usuarios():
 
 def login_page():
     iniciar_usuarios()
-    st.title("🔐 Login do Sistema")
-    aba = st.radio("", ["Entrar", "Cadastrar"])
+    st.markdown("""
+        <style>
+            .block-container {
+                padding-top: 3rem;
+            }
+            .login-box {
+                background-color: #f9f9f9;
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                max-width: 400px;
+                margin: auto;
+            }
+            .login-title {
+                text-align: center;
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-bottom: 1rem;
+            }
+            .logo {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                width: 150px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    st.image("logo.png", width=150)
+    aba = st.radio("", ["Entrar", "Cadastrar"], horizontal=True)
+
+    st.markdown("<div class='login-box'>", unsafe_allow_html=True)
 
     if aba == "Entrar":
+        st.markdown("<div class='login-title'>Acesso ao Portal</div>", unsafe_allow_html=True)
         usuario = st.text_input("Usuário")
         senha = st.text_input("Senha", type="password")
         if st.button("Entrar"):
@@ -37,6 +68,7 @@ def login_page():
                 st.error("Usuário ou senha incorretos.")
 
     elif aba == "Cadastrar":
+        st.markdown("<div class='login-title'>Cadastro de Novo Usuário</div>", unsafe_allow_html=True)
         with st.form("form_cadastro"):
             nome = st.text_input("Nome completo")
             email = st.text_input("E-mail")
@@ -48,12 +80,14 @@ def login_page():
                     st.warning("Esse nome de usuário já está em uso.")
                 else:
                     novo = pd.DataFrame(
-                        [[usuario, hash_senha(senha), nome, email, ""]],
-                        columns=["usuario", "senha", "nome", "email", "foto"]
+                        [[usuario, hash_senha(senha), nome, email, "", "", "", "", "", "", ""]],
+                        columns=["usuario", "senha", "nome", "email", "foto", "cpf", "rg", "data_nascimento", "endereco", "tel_fixo", "tel_celular"]
                     )
                     usuarios = pd.concat([usuarios.reset_index(), novo], ignore_index=True)
                     usuarios.to_csv(CAMINHO_USUARIOS, index=False)
                     st.success("Usuário cadastrado com sucesso! Faça login.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 def get_current_user():
     usuarios = carregar_usuarios()
