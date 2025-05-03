@@ -42,8 +42,8 @@ st.markdown("""
 }
 .align-center h1 {
     margin: 0;
-    font-size: 2.2rem;
-    line-height: 2.6rem;
+    font-size: 2.5rem;
+    line-height: 2.8rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -62,25 +62,21 @@ if st.sidebar.button("🏢 Fornecedores"):
     st.session_state.pagina = "fornecedores"
 
 if st.session_state.pagina == "fornecedores":
-    with st.container():
-        st.markdown("""
-        <div class='align-center'>
-            <h1>🏢 Fornecedores</h1>
-            <form action='#'>
-                <button type='submit' onclick="document.getElementById('cadastrar').click()">➕ Cadastrar Novo Fornecedor</button>
-            </form>
-            <input type='text' id='busca' name='busca' placeholder='Buscar...' style='height: 2.2rem; padding: 0 0.5rem;' />
-            <button style='height: 2.2rem;'>🔍</button>
-        </div>
-        """, unsafe_allow_html=True)
+    col1, col2, col3, col4 = st.columns([2.5, 2, 1.5, 0.5])
+    with col1:
+        st.markdown("<h1 class='align-center'>🏢 Fornecedores</h1>", unsafe_allow_html=True)
+    with col2:
+        if st.button("➕ Cadastrar Novo Fornecedor"):
+            st.session_state.editando = -1
+    with col3:
+        busca = st.text_input("", label_visibility="collapsed", placeholder="Buscar...", key="busca")
+    with col4:
+        buscar_botao = st.button("🔍", key="botao_busca")
 
     fornecedores = carregar_fornecedores()
 
-    busca = st.session_state.get("busca", "")
-    if busca:
+    if busca and buscar_botao:
         fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
-
-    # Botão de cadastro removido da parte inferior
 
     st.markdown("### Lista de Fornecedores")
     st.markdown("| Razão Social | Fantasia | CNPJ | E-mail | Telefone | Ações |")
