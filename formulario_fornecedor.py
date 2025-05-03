@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from fornecedores import carregar_fornecedores, salvar_fornecedores
+from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
 
 def mostrar_formulario_fornecedor(modo="novo", dados=None, index=None):
     titulo = "Cadastro de Fornecedor" if modo == "novo" else "Editar Fornecedor"
