@@ -51,18 +51,16 @@ if st.sidebar.button("🏢 Fornecedores"):
     st.session_state.pagina = "fornecedores"
 
 if st.session_state.pagina == "fornecedores":
-    col_t1, col_t2, col_t3 = st.columns([3, 1, 0.2])
+    col_t1, col_t2, col_t3, col_t4 = st.columns([2, 2, 1.5, 0.3])
     with col_t1:
         st.title("🏢 Fornecedores")
     with col_t2:
-        busca = st.text_input("", label_visibility="collapsed", placeholder="Buscar...", key="busca")
-    with col_t3:
-        buscar_botao = st.button("🔍", key="botao_busca")
-
-    col_add = st.columns([1])
-    with col_add[0]:
         if st.button("➕ Cadastrar Novo Fornecedor"):
             st.session_state.editando = -1
+    with col_t3:
+        busca = st.text_input("", label_visibility="collapsed", placeholder="Buscar...", key="busca")
+    with col_t4:
+        buscar_botao = st.button("🔍", key="botao_busca")
 
     fornecedores = carregar_fornecedores()
 
