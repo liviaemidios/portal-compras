@@ -5,25 +5,26 @@ import os
 
 CAMINHO_USUARIOS = "database/usuarios.csv"
 
-def iniciar_usuarios():
-    if not os.path.exists(CAMINHO_USUARIOS):
-        df = pd.DataFrame(columns=["usuario", "senha", "nome", "email", "foto"])
-        df.to_csv(CAMINHO_USUARIOS, index=False)
-
 def hash_senha(senha):
     return hashlib.md5(senha.encode()).hexdigest()
 
+def iniciar_usuarios():
+    if not os.path.exists(CAMINHO_USUARIOS):
+        df = pd.DataFrame(columns=["usuario", "senha", "nome"])
+        df.to_csv(CAMINHO_USUARIOS, index=False)
+
 def carregar_usuarios():
-    if os.path.exists(CAMINHO_USUARIOS):
-        df = pd.read_csv(CAMINHO_USUARIOS)
-        return df.set_index("usuario")
-    else:
-        return pd.DataFrame(columns=["usuario", "senha", "nome", "email", "foto"]).set_index("usuario")
+    df = pd.read_csv(CAMINHO_USUARIOS, dtype=str)
+    df.set_index("usuario", inplace=True)
+    return df
 
 def login_page():
+    if st.session_state.get("usuario"):
+        return
+
     iniciar_usuarios()
-    st.title("🔐 Login do Sistema")
-    aba = st.radio("", ["Entrar", "Cadastrar"])
+
+    aba = st.radio("Acesso", ["Entrar", "Cadastrar"], horizontal=True)
 
     if aba == "Entrar":
         usuario = st.text_input("Usuário")
@@ -32,29 +33,23 @@ def login_page():
             usuarios = carregar_usuarios()
             if usuario in usuarios.index and usuarios.loc[usuario, "senha"] == hash_senha(senha):
                 st.session_state.usuario = usuario
-                st.rerun()
+                st.experimental_rerun()
             else:
                 st.error("Usuário ou senha incorretos.")
 
     elif aba == "Cadastrar":
-        with st.form("form_cadastro"):
-            nome = st.text_input("Nome completo")
-            email = st.text_input("E-mail")
-            usuario = st.text_input("Nome de usuário")
-            senha = st.text_input("Senha", type="password")
-            foto = st.text_input("URL da foto de perfil (opcional)")
-            if st.form_submit_button("Cadastrar"):
-                usuarios = carregar_usuarios()
-                if usuario in usuarios.index:
-                    st.warning("Esse nome de usuário já está em uso.")
-                else:
-                    novo = pd.DataFrame(
-                        [[usuario, hash_senha(senha), nome, email, foto]],
-                        columns=["usuario", "senha", "nome", "email", "foto"]
-                    )
-                    usuarios = pd.concat([usuarios.reset_index(), novo], ignore_index=True)
-                    usuarios.to_csv(CAMINHO_USUARIOS, index=False)
-                    st.success("Usuário cadastrado com sucesso! Faça login.")
+        nome = st.text_input("Nome")
+        usuario = st.text_input("Usuário novo")
+        senha = st.text_input("Senha", type="password")
+        if st.button("Cadastrar"):
+            usuarios = carregar_usuarios()
+            if usuario in usuarios.index:
+                st.warning("Usuário já existe.")
+            else:
+                novo = pd.DataFrame([[usuario, hash_senha(senha), nome]], columns=["usuario", "senha", "nome"])
+                usuarios = pd.concat([usuarios.reset_index(), novo], ignore_index=True)
+                usuarios.to_csv(CAMINHO_USUARIOS, index=False)
+                st.success("Usuário cadastrado com sucesso.")
 
 def get_current_user():
     usuarios = carregar_usuarios()
