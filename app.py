@@ -4,6 +4,8 @@ import pandas as pd
 import os
 
 CAMINHO_USUARIOS = "database/usuarios.csv"
+CAMINHO_FORNECEDORES = "database/fornecedores.csv"
+
 st.set_page_config(page_title="Portal de Compras", layout="wide")
 
 # Verifica login
@@ -96,11 +98,33 @@ elif st.session_state.pagina == "fornecedores":
             submit = st.form_submit_button("Salvar")
 
             if submit:
+                novo = pd.DataFrame([{
+                    "cnpj": cnpj,
+                    "nome": nome,
+                    "email": email,
+                    "telefone": telefone,
+                    "endereco": endereco
+                }])
+                if os.path.exists(CAMINHO_FORNECEDORES):
+                    df_antigo = pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
+                    df_final = pd.concat([df_antigo, novo], ignore_index=True)
+                else:
+                    df_final = novo
+                df_final.to_csv(CAMINHO_FORNECEDORES, index=False)
                 st.success("Fornecedor cadastrado com sucesso!")
 
     st.markdown("### 🔍 Buscar fornecedor")
-    busca = st.text_input("Buscar por nome, CNPJ, email...")
-    st.write("📄 Lista de fornecedores aparecerá aqui...")
+    busca = st.text_input("Buscar por nome, CNPJ ou e-mail").lower()
+
+    if os.path.exists(CAMINHO_FORNECEDORES):
+        fornecedores = pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
+        if busca:
+            fornecedores = fornecedores[
+                fornecedores.apply(lambda row: busca in row.astype(str).str.lower().to_string(), axis=1)
+            ]
+        st.dataframe(fornecedores)
+    else:
+        st.info("Nenhum fornecedor cadastrado ainda.")
 
 elif st.session_state.pagina == "perfil":
     st.title("👤 Meu Perfil")
