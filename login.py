@@ -57,7 +57,7 @@ def login_page():
 
     if aba == "Entrar":
         st.markdown("<div class='login-title'>Acesso ao Portal</div>", unsafe_allow_html=True)
-        usuario = st.text_input("Usuário")
+        usuario = st.text_input("Usuário").strip().lower()
         senha = st.text_input("Senha", type="password")
         if st.button("Entrar"):
             usuarios = carregar_usuarios()
@@ -73,7 +73,7 @@ def login_page():
         with st.form("form_cadastro"):
             nome = st.text_input("Nome completo")
             email = st.text_input("E-mail")
-            usuario = st.text_input("Nome de usuário")
+            usuario = st.text_input("Nome de usuário").strip().lower()
             senha = st.text_input("Senha", type="password")
             if st.form_submit_button("Cadastrar"):
                 usuarios = carregar_usuarios()
