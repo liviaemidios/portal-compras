@@ -60,14 +60,12 @@ with st.sidebar:
     st.markdown(f"**Usuário:** {usuario['nome']}")
     st.markdown("---")
 
-    with st.form("menu_form"):
-        for nome, valor in menu.items():
-            ativo = "sidebar-button active" if st.session_state.pagina == valor else "sidebar-button"
-            submitted = st.form_submit_button(nome)
+    for nome, valor in menu.items():
+        ativo = "sidebar-button active" if st.session_state.pagina == valor else "sidebar-button"
+        if st.button(nome, key=f"menu_{valor}"):
+            st.session_state.pagina = valor
+        else:
             st.markdown(f"<div class='{ativo}'>{nome}</div>", unsafe_allow_html=True)
-            if submitted:
-                st.session_state.pagina = valor
-                st.experimental_rerun()
 
 # Conteúdo das páginas
 if st.session_state.pagina == "dashboard":
