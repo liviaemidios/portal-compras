@@ -43,9 +43,9 @@ def mostrar_formulario_fornecedor(modo="novo", dados=None, index=None):
                     df.at[index, campo] = novo[campo]
             salvar_fornecedores(df)
             st.success("Fornecedor salvo com sucesso!")
-            st.experimental_set_query_params()  # limpa os parâmetros da URL
+            st.query_params.clear()
             st.rerun()
 
         if cancelar:
-            st.experimental_set_query_params()  # limpa os parâmetros da URL
+            st.query_params.clear()
             st.rerun()
