@@ -5,8 +5,6 @@ from login import login_page, get_current_user
 
 CAMINHO_FORNECEDORES = "database/fornecedores.csv"
 
-st.set_page_config(page_title="Portal de Compras", layout="wide")
-
 if not st.session_state.get("usuario"):
     login_page()
     st.stop()
@@ -25,7 +23,6 @@ if "visualizando" not in st.session_state:
 if "cadastrando" not in st.session_state:
     st.session_state.cadastrando = False
 
-# ✅ Atualizado para usar st.query_params
 query_params = st.query_params
 if query_params.get("cadastrar") == ["true"]:
     st.session_state.cadastrando = True
@@ -72,11 +69,6 @@ def carregar_fornecedores():
 
 def salvar_fornecedores(df):
     df.to_csv(CAMINHO_FORNECEDORES, index=False)
-
-st.sidebar.markdown(f"**Usuário:** {usuario['nome']}")
-st.sidebar.markdown("---")
-if st.sidebar.button("🏢 Fornecedores"):
-    st.session_state.pagina = "fornecedores"
 
 if st.session_state.pagina == "fornecedores":
     st.markdown("""
