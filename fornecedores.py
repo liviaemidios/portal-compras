@@ -37,41 +37,23 @@ def renderizar_fornecedores():
     if "cadastrando" not in st.session_state:
         st.session_state.cadastrando = False
 
-    st.markdown("""
-        <style>
-        .search-bar input {
-            height: 2.2rem;
-            padding: 0 0.5rem;
-            font-size: 0.9rem;
-        }
-        .search-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-        }
-        .search-row h2 {
-            font-size: 1.8rem;
-            margin: 0;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # Linha superior com título, botão e campo de busca
-    col1, col2, col3, col4 = st.columns([2.5, 2, 2.5, 1])
+    # Cabeçalho com alinhamento
+    col1, col2, col3, col4, col5 = st.columns([2.5, 2.2, 3, 2, 0.6])
 
     with col1:
         st.markdown("## 🏢 Fornecedores")
 
     with col2:
-        if st.button("➕ Cadastrar Novo Fornecedor"):
+        if st.button("➕ Cadastrar"):
             st.session_state.cadastrando = True
 
     with col3:
-        busca = st.text_input("", placeholder="Pesquisar...", label_visibility="collapsed")
+        busca = st.text_input("", placeholder="Pesquisar fornecedor...", label_visibility="collapsed")
 
     with col4:
-        st.write("")  # espaçamento
+        st.write("")
+
+    with col5:
         st.button("🔍")
 
     # Formulário de cadastro
@@ -123,7 +105,6 @@ def renderizar_fornecedores():
                     st.session_state.rerun = True
                     st.stop()
 
-    # Carrega fornecedores e mostra tabela
     fornecedores = carregar_fornecedores()
 
     col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
