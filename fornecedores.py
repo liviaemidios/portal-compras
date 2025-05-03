@@ -37,8 +37,8 @@ def renderizar_fornecedores():
     if "cadastrando" not in st.session_state:
         st.session_state.cadastrando = False
 
-    # Cabeçalho com alinhamento
-    col1, col2, col3, col4, col5 = st.columns([2.5, 2.2, 3, 2, 0.6])
+    # Cabeçalho com título à esquerda e busca à direita
+    col1, col2, col3, col4 = st.columns([2.5, 1.8, 5, 0.7])
 
     with col1:
         st.markdown("## 🏢 Fornecedores")
@@ -52,8 +52,6 @@ def renderizar_fornecedores():
 
     with col4:
         st.write("")
-
-    with col5:
         st.button("🔍")
 
     # Formulário de cadastro
