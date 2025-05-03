@@ -17,6 +17,10 @@ def salvar_fornecedores(df):
     df.to_csv(CAMINHO_FORNECEDORES, index=False)
 
 def renderizar_fornecedores():
+    if st.session_state.get("rerun"):
+        st.session_state.rerun = False
+        st.experimental_rerun()
+
     if not st.session_state.get("usuario"):
         login_page()
         st.stop()
@@ -91,13 +95,15 @@ def renderizar_fornecedores():
                     salvar_fornecedores(fornecedores)
                     st.success("Fornecedor cadastrado com sucesso!")
                     st.session_state.cadastrando = False
-                    st.experimental_rerun()
+                    st.session_state.rerun = True
+                    st.stop()
+
                 elif cancelar:
                     st.session_state.cadastrando = False
-                    st.experimental_rerun()
+                    st.session_state.rerun = True
+                    st.stop()
 
     fornecedores = carregar_fornecedores()
-    st.markdown("### Lista de Fornecedores")
 
     col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
     col1.markdown("**Razão Social**")
@@ -123,4 +129,5 @@ def renderizar_fornecedores():
                 fornecedores = fornecedores.drop(i).reset_index(drop=True)
                 salvar_fornecedores(fornecedores)
                 st.success("Fornecedor excluído com sucesso.")
-                st.experimental_rerun()
+                st.session_state.rerun = True
+                st.stop()
