@@ -40,7 +40,7 @@ else:
         st.subheader("👤 Meu Perfil")
 
         if usuario.get("foto") and os.path.exists(usuario["foto"]):
-            st.image(usuario["foto"], width=150)
+            st.image("https://i.postimg.cc/mg04q0cP/logo-portal-compras.png", width=200)
             if st.button("🗑️ Remover Foto"):
                 try:
                     os.remove(usuario["foto"])
