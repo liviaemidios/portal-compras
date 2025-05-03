@@ -25,20 +25,22 @@ if "pagina" not in st.session_state:
 # Estilo do menu
 st.markdown("""
 <style>
-.sidebar-container div {
+.sidebar-button {
     display: block;
     padding: 0.6rem 1rem;
     margin: 0.3rem 0;
+    background-color: #e9f2fb;
     border-radius: 8px;
     color: #003366;
     font-weight: 500;
-    cursor: pointer;
+    text-decoration: none;
     transition: background-color 0.3s;
 }
-.sidebar-container div:hover {
+.sidebar-button:hover {
     background-color: #d8e7f9;
+    cursor: pointer;
 }
-.sidebar-container .active {
+.sidebar-button.active {
     background-color: #3879bd;
     color: white;
     font-weight: bold;
@@ -57,13 +59,15 @@ menu = {
 with st.sidebar:
     st.markdown(f"**Usuário:** {usuario['nome']}")
     st.markdown("---")
-    st.markdown('<div class="sidebar-container">', unsafe_allow_html=True)
-    for nome, valor in menu.items():
-        ativo = "active" if st.session_state.pagina == valor else ""
-        if st.button(f"{nome}", key=f"menu_{valor}"):
-            st.session_state.pagina = valor
-        st.markdown(f'<div class="{ativo}">{nome}</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+
+    with st.form("menu_form"):
+        for nome, valor in menu.items():
+            ativo = "sidebar-button active" if st.session_state.pagina == valor else "sidebar-button"
+            submitted = st.form_submit_button(nome)
+            st.markdown(f"<div class='{ativo}'>{nome}</div>", unsafe_allow_html=True)
+            if submitted:
+                st.session_state.pagina = valor
+                st.experimental_rerun()
 
 # Conteúdo das páginas
 if st.session_state.pagina == "dashboard":
