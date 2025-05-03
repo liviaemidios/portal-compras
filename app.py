@@ -1,7 +1,7 @@
 import streamlit as st
 from setup import inicializar_sistema
 from login import login_page, get_current_user
-import distribuidores as mod_distribuidores
+import distribuidoras as mod_distribuidoras
 import produtos as mod_produtos
 import fornecedores as mod_fornecedores
 
@@ -39,6 +39,6 @@ with st.sidebar:
 if menu == "🏢 Fornecedores":
     mod_fornecedores.renderizar_fornecedores()
 elif menu == "🚚 Distribuidoras":
-    mod_distribuidores.renderizar_distribuidores()
+    mod_distribuidoras.renderizar_distribuidoras()
 elif menu == "📦 Produtos":
     mod_produtos.renderizar_produtos()
