@@ -36,7 +36,7 @@ st.markdown("""
 }
 .title-row {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 1rem;
     margin-bottom: 1rem;
 }
@@ -44,10 +44,6 @@ st.markdown("""
     font-size: 2.8rem;
     line-height: 2.8rem;
     margin: 0;
-}
-.title-row button,
-.title-row input {
-    margin-top: 0.5rem;
 }
 </style>
 """, unsafe_allow_html=True)
