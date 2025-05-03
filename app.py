@@ -34,8 +34,11 @@ st.markdown("""
     width: 150px !important;
     display: inline;
 }
-.title-aligned h1 {
-    margin-bottom: 0.4rem;
+.align-center {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -54,20 +57,22 @@ if st.sidebar.button("🏢 Fornecedores"):
     st.session_state.pagina = "fornecedores"
 
 if st.session_state.pagina == "fornecedores":
-    col_t1, col_t2, col_t3, col_t4 = st.columns([2, 2, 1.5, 0.3])
-    with col_t1:
-        st.markdown("<div class='title-aligned'><h1>🏢 Fornecedores</h1></div>", unsafe_allow_html=True)
-    with col_t2:
-        if st.button("➕ Cadastrar Novo Fornecedor"):
-            st.session_state.editando = -1
-    with col_t3:
-        busca = st.text_input("", label_visibility="collapsed", placeholder="Buscar...", key="busca")
-    with col_t4:
-        buscar_botao = st.button("🔍", key="botao_busca")
+    with st.container():
+        st.markdown("""
+        <div class='align-center'>
+            <h1 style='margin: 0;'>🏢 Fornecedores</h1>
+            <form action='#'>
+                <button type='submit'>➕ Cadastrar Novo Fornecedor</button>
+            </form>
+            <input type='text' placeholder='Buscar...' style='height: 2.2rem; padding: 0 0.5rem;'/>
+            <button style='height: 2.2rem;'>🔍</button>
+        </div>
+        """, unsafe_allow_html=True)
 
     fornecedores = carregar_fornecedores()
 
-    if busca and buscar_botao:
+    busca = st.session_state.get("busca", "")
+    if busca:
         fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
 
     st.markdown("### Lista de Fornecedores")
