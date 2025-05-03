@@ -49,8 +49,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-if st.session_state.get("usuario") is None:
+if not st.session_state.get("usuario"):
     login_page()
+    st.stop()
 else:
     usuario = get_current_user()
 
