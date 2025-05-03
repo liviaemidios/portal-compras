@@ -1,1 +1,1 @@
-cnpj,nome,email,telefone,endereco
+razao_social,nome_fantasia,cnpj,telefone,email,endereco,inscricao_estadual,inscricao_municipal,pedido_minimo,prazo_pagamento
