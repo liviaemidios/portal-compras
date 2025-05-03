@@ -8,24 +8,19 @@ CAMINHO_USUARIOS = "database/usuarios.csv"
 def iniciar_usuarios():
     if not os.path.exists(CAMINHO_USUARIOS):
         df = pd.DataFrame(columns=[
-            "usuario", "senha", "nome", "email", "foto",
+            "senha", "nome", "email", "foto",
             "cpf", "rg", "data_nascimento", "endereco",
             "tel_fixo", "tel_celular"
         ])
-        df.to_csv(CAMINHO_USUARIOS, index=False)
+        df.index.name = "usuario"
+        df.to_csv(CAMINHO_USUARIOS, encoding="utf-8")
 
 def hash_senha(senha):
     return hashlib.md5(senha.encode()).hexdigest()
 
 def carregar_usuarios():
-    if os.path.exists(CAMINHO_USUARIOS):
-        df = pd.read_csv(CAMINHO_USUARIOS, dtype=str)
-        df.set_index("usuario", inplace=True)
-        return df
-    else:
-        return pd.DataFrame(columns=[
-            "usuario", "senha", "nome", "email", "foto"
-        ]).set_index("usuario")
+    # ✅ Lê o arquivo com a coluna 'usuario' como índice
+    return pd.read_csv(CAMINHO_USUARIOS, index_col="usuario", dtype=str)
 
 def login_page():
     iniciar_usuarios()
@@ -83,13 +78,20 @@ def login_page():
                 if usuario in usuarios.index:
                     st.warning("Esse nome de usuário já está em uso.")
                 else:
-                    novo = pd.DataFrame(
-                        [[usuario, hash_senha(senha), nome, email, "", "", "", "", "", "", ""]],
-                        columns=["usuario", "senha", "nome", "email", "foto", "cpf", "rg",
-                                 "data_nascimento", "endereco", "tel_fixo", "tel_celular"]
-                    )
-                    usuarios = pd.concat([usuarios.reset_index(), novo], ignore_index=True)
-                    usuarios.to_csv(CAMINHO_USUARIOS, index=False, encoding="utf-8")
+                    novo = pd.DataFrame([{
+                        "senha": hash_senha(senha),
+                        "nome": nome,
+                        "email": email,
+                        "foto": "",
+                        "cpf": "",
+                        "rg": "",
+                        "data_nascimento": "",
+                        "endereco": "",
+                        "tel_fixo": "",
+                        "tel_celular": ""
+                    }], index=[usuario])
+                    usuarios = pd.concat([usuarios, novo])
+                    usuarios.to_csv(CAMINHO_USUARIOS, encoding="utf-8")
                     st.success("Usuário cadastrado com sucesso! Faça login.")
 
     st.markdown("</div>", unsafe_allow_html=True)
