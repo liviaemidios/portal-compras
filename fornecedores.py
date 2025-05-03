@@ -4,19 +4,6 @@ from login import login_page, get_current_user
 from formulario_fornecedor import mostrar_formulario_fornecedor
 from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
 
-CAMINHO_FORNECEDORES = "database/fornecedores.csv"
-
-def carregar_fornecedores():
-    if os.path.exists(CAMINHO_FORNECEDORES):
-        return pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
-    return pd.DataFrame(columns=[
-        "razao_social", "nome_fantasia", "cnpj", "telefone", "email", "endereco",
-        "inscricao_estadual", "inscricao_municipal", "pedido_minimo", "prazo_pagamento"
-    ])
-
-def salvar_fornecedores(df):
-    df.to_csv(CAMINHO_FORNECEDORES, index=False)
-
 def renderizar_fornecedores():
     if st.session_state.get("rerun"):
         st.session_state.rerun = False
@@ -38,7 +25,6 @@ def renderizar_fornecedores():
     if "cadastrando" not in st.session_state:
         st.session_state.cadastrando = False
 
-    # Cabeçalho alinhado
     col1, col2, col3, col4 = st.columns([3, 2.5, 3.5, 0.5])
     with col1:
         st.markdown("<h4 style='margin-top: 0.8em;'>🏢 Fornecedores</h4>", unsafe_allow_html=True)
@@ -52,7 +38,6 @@ def renderizar_fornecedores():
         st.write("")
         st.button("🔍")
 
-    # Exibir formulário em modo pop-up
     if st.session_state.cadastrando:
         mostrar_formulario_fornecedor(modo="novo")
 
@@ -61,7 +46,6 @@ def renderizar_fornecedores():
         dados = carregar_fornecedores().iloc[index].to_dict()
         mostrar_formulario_fornecedor(modo="editar", dados=dados, index=index)
 
-    # Lista de fornecedores
     fornecedores = carregar_fornecedores()
 
     col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
