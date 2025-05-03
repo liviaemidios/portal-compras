@@ -23,12 +23,10 @@ def carregar_usuarios():
     return df
 
 def login_page():
-    # ✅ Não exibe nada se o usuário já estiver logado
     if st.session_state.get("usuario"):
         return
 
     iniciar_usuarios()
-
     aba = st.radio("", ["Entrar", "Cadastrar"], horizontal=True)
 
     if aba == "Entrar":
@@ -77,4 +75,3 @@ def get_current_user():
     if "usuario" in st.session_state and st.session_state.usuario in usuarios.index:
         return usuarios.loc[st.session_state.usuario].to_dict()
     return None
-
