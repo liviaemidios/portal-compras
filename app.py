@@ -59,9 +59,13 @@ menu = {
 with st.sidebar:
     st.markdown(f"**Usuário:** {usuario['nome']}")
     st.markdown("---")
+
     for nome, valor in menu.items():
-        if st.button(nome):
-            st.session_state.pagina = valor
+        ativo = "active" if st.session_state.pagina == valor else ""
+        st.markdown(
+            f"<div class='sidebar-button {ativo}' onclick=\"window.location.href='?pagina={valor}'\">{nome}</div>",
+            unsafe_allow_html=True
+        )
 
 # Conteúdo das páginas
 if st.session_state.pagina == "dashboard":
