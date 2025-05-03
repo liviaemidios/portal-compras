@@ -22,6 +22,8 @@ if "editando" not in st.session_state:
     st.session_state.editando = None
 if "visualizando" not in st.session_state:
     st.session_state.visualizando = None
+if "cadastrando" not in st.session_state:
+    st.session_state.cadastrando = False
 
 st.markdown("""
 <style>
@@ -66,7 +68,7 @@ st.markdown("""
 def carregar_fornecedores():
     if os.path.exists(CAMINHO_FORNECEDORES):
         return pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
-    return pd.DataFrame(columns=["razao_social", "nome_fantasia", "cnpj", "telefone", "email", "endereco"])
+    return pd.DataFrame(columns=["razao_social", "nome_fantasia", "cnpj", "telefone", "email", "endereco", "inscricao_estadual", "inscricao_municipal", "pedido_minimo", "prazo_pagamento"])
 
 def salvar_fornecedores(df):
     df.to_csv(CAMINHO_FORNECEDORES, index=False)
@@ -81,12 +83,60 @@ if st.session_state.pagina == "fornecedores":
     <div class='title-row'>
         <h1>🏢 Fornecedores</h1>
         <div class='actions'>
-            <button onclick=\"window.location.reload();\">➕ Cadastrar Novo Fornecedor</button>
+            <form method='post'>
+                <button name='cadastrar' type='submit'>➕ Cadastrar Novo Fornecedor</button>
+            </form>
             <input type='text' id='busca' name='busca' placeholder='Buscar...' style='height: 2.2rem; padding: 0 0.5rem;' />
             <button style='height: 2.2rem;'>🔍</button>
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    if st.session_state.cadastrando:
+        with st.expander("➕ Cadastrar Novo Fornecedor", expanded=True):
+            with st.form("form_cadastrar_fornecedor"):
+                st.subheader("Dados da Empresa")
+                razao_social = st.text_input("Razão Social")
+                nome_fantasia = st.text_input("Nome Fantasia")
+                cnpj = st.text_input("CNPJ")
+                inscricao_estadual = st.text_input("Inscrição Estadual")
+                inscricao_municipal = st.text_input("Inscrição Municipal")
+
+                st.subheader("Contato")
+                telefone = st.text_input("Telefone")
+                email = st.text_input("E-mail")
+                endereco = st.text_area("Endereço")
+
+                st.subheader("Condições Comerciais")
+                pedido_minimo = st.text_input("Valor Mínimo de Pedido")
+                prazo_pagamento = st.text_input("Prazo de Pagamento")
+
+                col_a, col_b = st.columns(2)
+                salvar = col_a.form_submit_button("Salvar")
+                cancelar = col_b.form_submit_button("Cancelar")
+
+                if salvar:
+                    novo = pd.DataFrame([{
+                        "razao_social": razao_social,
+                        "nome_fantasia": nome_fantasia,
+                        "cnpj": cnpj,
+                        "telefone": telefone,
+                        "email": email,
+                        "endereco": endereco,
+                        "inscricao_estadual": inscricao_estadual,
+                        "inscricao_municipal": inscricao_municipal,
+                        "pedido_minimo": pedido_minimo,
+                        "prazo_pagamento": prazo_pagamento
+                    }])
+                    fornecedores = carregar_fornecedores()
+                    fornecedores = pd.concat([fornecedores, novo], ignore_index=True)
+                    salvar_fornecedores(fornecedores)
+                    st.success("Fornecedor cadastrado com sucesso!")
+                    st.session_state.cadastrando = False
+                    st.rerun()
+                elif cancelar:
+                    st.session_state.cadastrando = False
+                    st.rerun()
 
     fornecedores = carregar_fornecedores()
 
@@ -130,45 +180,9 @@ if st.session_state.pagina == "fornecedores":
             st.markdown(f"**E-mail:** {fornecedor['email']}")
             st.markdown(f"**Telefone:** {fornecedor['telefone']}")
             st.markdown(f"**Endereço:** {fornecedor['endereco']}")
+            st.markdown(f"**Inscrição Estadual:** {fornecedor.get('inscricao_estadual', '')}")
+            st.markdown(f"**Inscrição Municipal:** {fornecedor.get('inscricao_municipal', '')}")
+            st.markdown(f"**Pedido Mínimo:** {fornecedor.get('pedido_minimo', '')}")
+            st.markdown(f"**Prazo de Pagamento:** {fornecedor.get('prazo_pagamento', '')}")
             if st.button("Fechar visualização"):
                 st.session_state.visualizando = None
-
-    if st.session_state.editando is not None:
-        if st.session_state.editando == -1:
-            dados = {"razao_social": "", "nome_fantasia": "", "cnpj": "", "telefone": "", "email": "", "endereco": ""}
-        else:
-            dados = fornecedores.loc[st.session_state.editando]
-
-        with st.expander("✏️ Editar Fornecedor", expanded=True):
-            with st.form("form_edit_fornecedor"):
-                razao_social = st.text_input("Razão Social", value=dados['razao_social'])
-                nome_fantasia = st.text_input("Nome Fantasia", value=dados['nome_fantasia'])
-                cnpj = st.text_input("CNPJ", value=dados['cnpj'])
-                telefone = st.text_input("Telefone", value=dados['telefone'])
-                email = st.text_input("E-mail", value=dados['email'])
-                endereco = st.text_area("Endereço", value=dados['endereco'])
-                col_a, col_b, col_c = st.columns(3)
-                salvar = col_a.form_submit_button("Salvar")
-                cancelar = col_b.form_submit_button("Cancelar")
-                fechar = col_c.form_submit_button("Fechar")
-
-                if salvar:
-                    novo = pd.DataFrame([{
-                        "razao_social": razao_social,
-                        "nome_fantasia": nome_fantasia,
-                        "cnpj": cnpj,
-                        "telefone": telefone,
-                        "email": email,
-                        "endereco": endereco
-                    }])
-                    if st.session_state.editando == -1:
-                        fornecedores = pd.concat([fornecedores, novo], ignore_index=True)
-                    else:
-                        fornecedores.loc[st.session_state.editando] = novo.iloc[0]
-                    salvar_fornecedores(fornecedores)
-                    st.success("Fornecedor salvo com sucesso!")
-                    st.session_state.editando = None
-                    st.rerun()
-                elif cancelar or fechar:
-                    st.session_state.editando = None
-                    st.rerun()
