@@ -27,13 +27,15 @@ st.markdown("""
 <style>
 .sidebar-button {
     display: block;
+    width: 100%;
     padding: 0.6rem 1rem;
     margin: 0.3rem 0;
+    border: none;
+    text-align: left;
     background-color: #e9f2fb;
-    border-radius: 8px;
     color: #003366;
     font-weight: 500;
-    text-decoration: none;
+    border-radius: 8px;
     transition: background-color 0.3s;
 }
 .sidebar-button:hover {
@@ -61,11 +63,13 @@ with st.sidebar:
     st.markdown("---")
 
     for nome, valor in menu.items():
-        ativo = "sidebar-button active" if st.session_state.pagina == valor else "sidebar-button"
-        if st.button(nome, key=f"menu_{valor}"):
+        is_active = st.session_state.pagina == valor
+        style_class = "sidebar-button active" if is_active else "sidebar-button"
+        st.markdown(f"<button class='{style_class}' onclick=\"window.location.href='#{valor}'\">{nome}</button>", unsafe_allow_html=True)
+        if st.session_state.get("clicked") != valor and st.button(nome, key=f"menu_{valor}"):
             st.session_state.pagina = valor
-        else:
-            st.markdown(f"<div class='{ativo}'>{nome}</div>", unsafe_allow_html=True)
+            st.session_state.clicked = valor
+            st.experimental_rerun()
 
 # Conteúdo das páginas
 if st.session_state.pagina == "dashboard":
