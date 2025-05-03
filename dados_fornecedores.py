@@ -1,4 +1,3 @@
-# dados_fornecedores.py
 import pandas as pd
 import os
 
@@ -27,3 +26,4 @@ def carregar_fornecedores():
 
 def salvar_fornecedores(df):
     df.to_csv("database/fornecedores.csv", index=False)
+
