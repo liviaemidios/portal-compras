@@ -1,9 +1,12 @@
 import streamlit as st
 from login import login_page, get_current_user
+import pandas as pd
+import os
 
+CAMINHO_USUARIOS = "database/usuarios.csv"
 st.set_page_config(page_title="Portal de Compras", layout="wide")
 
-# Verifica se está logado
+# Verifica login
 if not st.session_state.get("usuario"):
     login_page()
     st.stop()
@@ -13,9 +16,13 @@ if usuario is None:
     st.error("Erro ao carregar o usuário.")
     st.stop()
 
-# Página ativa
+# Controla a página ativa
 if "pagina" not in st.session_state:
     st.session_state.pagina = "dashboard"
+
+# Verifica se há parâmetro na URL
+if "pagina" in st.query_params:
+    st.session_state.pagina = st.query_params["pagina"]
 
 # Estilo do menu
 st.markdown("""
@@ -52,14 +59,16 @@ menu = {
 
 with st.sidebar:
     st.markdown(f"**Usuário:** {usuario['nome']}")
-
     st.markdown("---")
+
     for nome, valor in menu.items():
         ativo = "active" if st.session_state.pagina == valor else ""
-        if st.button(nome):
-            st.session_state.pagina = valor
+        st.markdown(
+            f"<div class='sidebar-button {ativo}' onclick=\"window.location.href='?pagina={valor}'\">{nome}</div>",
+            unsafe_allow_html=True
+        )
 
-# Conteúdo da página
+# Conteúdo das páginas
 if st.session_state.pagina == "dashboard":
     st.title("📊 Dashboard")
     st.success(f"Bem-vinda, {usuario['nome']}!")
@@ -74,3 +83,6 @@ elif st.session_state.pagina == "sair":
     st.session_state.usuario = None
     st.session_state.pagina = None
     st.rerun()
+
+else:
+    st.warning("Página não encontrada.")
