@@ -51,30 +51,15 @@ def renderizar_fornecedores():
         st.write("")
         st.button("🔍")
 
-    # Simula modal
+    # Pop-up de cadastro
     if st.session_state.cadastrando:
-        st.markdown("""
-            <style>
-            .modal-container {
-                background-color: #f9f9f9;
-                padding: 2rem;
-                border-radius: 10px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-                border: 1px solid #ccc;
-                position: relative;
-                z-index: 999;
-            }
-            </style>
-        """, unsafe_allow_html=True)
-
+        st.markdown("---")
         with st.container():
-            st.markdown('<div class="modal-container">', unsafe_allow_html=True)
-            col_close, _ = st.columns([0.15, 5])
-            with col_close:
-                if st.button("❌ Fechar"):
+            col_f, col_x = st.columns([10, 1])
+            with col_x:
+                if st.button("❌", key="fechar_popup"):
                     st.session_state.cadastrando = False
                     st.stop()
-
             with st.form("form_cadastrar_fornecedor"):
                 st.subheader("Cadastro de Fornecedor")
                 razao_social = st.text_input("Razão Social")
@@ -112,13 +97,13 @@ def renderizar_fornecedores():
                     st.session_state.cadastrando = False
                     st.session_state.rerun = True
                     st.stop()
-
                 if cancelar:
                     st.session_state.cadastrando = False
                     st.stop()
 
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("---")
 
+    # Carrega a lista após cadastro
     fornecedores = carregar_fornecedores()
 
     col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
