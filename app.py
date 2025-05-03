@@ -22,14 +22,14 @@ if st.session_state.usuario is None:
 else:
     usuario = get_current_user()
 
-    # === SIDEBAR COM FOTO DE PERFIL E BOTÃO DE PERFIL ===
     with st.sidebar:
         st.markdown(f"**Usuário:** {usuario['nome']}")
 
-        if usuario.get("foto") and os.path.exists(usuario["foto"]):
-            st.image(usuario["foto"], width=120)
+        foto = usuario.get("foto")
+        if isinstance(foto, str) and foto.strip() and os.path.exists(foto):
+            st.image(foto, width=120)
         else:
-            st.image("logo.png", width=120)  # LOGO local como fallback
+            st.image("logo.png", width=120)
 
         if st.button("👤 Meu Perfil"):
             st.session_state.pagina = "meu_perfil"
@@ -44,15 +44,15 @@ else:
             "🚪 Sair"
         ])
 
-    # === PERFIL DO USUÁRIO ===
     if st.session_state.pagina == "meu_perfil":
         st.subheader("👤 Meu Perfil")
 
-        if usuario.get("foto") and os.path.exists(usuario["foto"]):
-            st.image(usuario["foto"], width=150)
+        foto = usuario.get("foto")
+        if isinstance(foto, str) and foto.strip() and os.path.exists(foto):
+            st.image(foto, width=150)
             if st.button("🗑️ Remover Foto"):
                 try:
-                    os.remove(usuario["foto"])
+                    os.remove(foto)
                 except:
                     pass
                 df = pd.read_csv(CAMINHO_USUARIOS)
@@ -98,9 +98,8 @@ else:
                 st.session_state.pagina = None
                 st.rerun()
 
-    # === PÁGINAS DO MENU ===
     elif pagina == "🏠 Dashboard":
-        st.image("logo.png", width=200)  # LOGO na página inicial
+        st.image("logo.png", width=200)
         st.title("Bem-vindo ao Portal de Compras Internas")
         st.info("Selecione uma das opções no menu à esquerda.")
 
