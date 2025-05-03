@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from login import login_page, get_current_user
+from formulario_fornecedor import mostrar_formulario_fornecedor
 
 CAMINHO_FORNECEDORES = "database/fornecedores.csv"
 
@@ -51,59 +52,16 @@ def renderizar_fornecedores():
         st.write("")
         st.button("🔍")
 
-    # Pop-up de cadastro
+    # Exibir formulário em modo pop-up
     if st.session_state.cadastrando:
-        st.markdown("---")
-        with st.container():
-            col_f, col_x = st.columns([10, 1])
-            with col_x:
-                if st.button("❌", key="fechar_popup"):
-                    st.session_state.cadastrando = False
-                    st.stop()
-            with st.form("form_cadastrar_fornecedor"):
-                st.subheader("Cadastro de Fornecedor")
-                razao_social = st.text_input("Razão Social")
-                nome_fantasia = st.text_input("Nome Fantasia")
-                cnpj = st.text_input("CNPJ")
-                inscricao_estadual = st.text_input("Inscrição Estadual")
-                inscricao_municipal = st.text_input("Inscrição Municipal")
-                telefone = st.text_input("Telefone")
-                email = st.text_input("E-mail")
-                endereco = st.text_area("Endereço")
-                pedido_minimo = st.text_input("Valor Mínimo de Pedido")
-                prazo_pagamento = st.text_input("Prazo de Pagamento")
+        mostrar_formulario_fornecedor(modo="novo")
 
-                col_a, col_b = st.columns(2)
-                salvar = col_a.form_submit_button("Salvar")
-                cancelar = col_b.form_submit_button("Cancelar")
+    if st.session_state.editando is not None:
+        index = st.session_state.editando
+        dados = carregar_fornecedores().iloc[index].to_dict()
+        mostrar_formulario_fornecedor(modo="editar", dados=dados, index=index)
 
-                if salvar:
-                    novo = pd.DataFrame([{
-                        "razao_social": razao_social,
-                        "nome_fantasia": nome_fantasia,
-                        "cnpj": cnpj,
-                        "telefone": telefone,
-                        "email": email,
-                        "endereco": endereco,
-                        "inscricao_estadual": inscricao_estadual,
-                        "inscricao_municipal": inscricao_municipal,
-                        "pedido_minimo": pedido_minimo,
-                        "prazo_pagamento": prazo_pagamento
-                    }])
-                    fornecedores = carregar_fornecedores()
-                    fornecedores = pd.concat([fornecedores, novo], ignore_index=True)
-                    salvar_fornecedores(fornecedores)
-                    st.success("Fornecedor cadastrado com sucesso!")
-                    st.session_state.cadastrando = False
-                    st.session_state.rerun = True
-                    st.stop()
-                if cancelar:
-                    st.session_state.cadastrando = False
-                    st.stop()
-
-        st.markdown("---")
-
-    # Carrega a lista após cadastro
+    # Lista de fornecedores
     fornecedores = carregar_fornecedores()
 
     col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
@@ -122,13 +80,16 @@ def renderizar_fornecedores():
         col4.write(row["email"])
         col5.write(row["telefone"])
         with col6:
-            if st.button("🔍", key=f"ver_{i}"):
-                st.session_state.visualizando = i
-            if st.button("✏️", key=f"edit_{i}"):
-                st.session_state.editando = i
-            if st.button("🗑️", key=f"del_{i}"):
-                fornecedores = fornecedores.drop(i).reset_index(drop=True)
-                salvar_fornecedores(fornecedores)
-                st.success("Fornecedor excluído com sucesso.")
-                st.session_state.rerun = True
-                st.stop()
+            col_a, col_b, col_c = st.columns(3)
+            with col_a:
+                if st.button("🔍", key=f"ver_{i}"):
+                    st.session_state.visualizando = i
+            with col_b:
+                if st.button("✏️", key=f"edit_{i}"):
+                    st.session_state.editando = i
+            with col_c:
+                if st.button("🗑️", key=f"del_{i}"):
+                    fornecedores = fornecedores.drop(i).reset_index(drop=True)
+                    salvar_fornecedores(fornecedores)
+                    st.success("Fornecedor excluído com sucesso.")
+                    st.experimental_rerun()
