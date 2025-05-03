@@ -19,7 +19,6 @@ def hash_senha(senha):
     return hashlib.md5(senha.encode()).hexdigest()
 
 def carregar_usuarios():
-    # ✅ Lê o arquivo com a coluna 'usuario' como índice
     return pd.read_csv(CAMINHO_USUARIOS, index_col="usuario", dtype=str)
 
 def login_page():
@@ -59,10 +58,11 @@ def login_page():
             st.write("DEBUG >> Tentando logar:", usuario)
             st.write("DEBUG >> Usuários disponíveis:", list(usuarios.index))
             if usuario in usuarios.index and usuarios.loc[usuario, "senha"] == hash_senha(senha):
+                st.success("Login realizado com sucesso.")
                 st.session_state.usuario = usuario
                 st.session_state.pagina = "dashboard"
-                st.success("Login realizado com sucesso.")
-                st.rerun()
+                st.experimental_set_query_params(logged="1")
+                st.experimental_rerun()
             else:
                 st.error("Usuário ou senha incorretos.")
 
