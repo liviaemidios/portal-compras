@@ -33,52 +33,22 @@ def renderizar_fornecedores():
     if "cadastrando" not in st.session_state:
         st.session_state.cadastrando = False
 
-    query_params = st.query_params
-    if query_params.get("cadastrar") == ["true"]:
-        st.session_state.cadastrando = True
-        st.query_params.clear()
+    # Cabeçalho com título, botão e campo de busca
+    col_titulo, col_btn, col_pesquisa, col_lupa = st.columns([3, 2, 4, 1])
 
-    st.markdown("""
-    <style>
-    .title-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-    }
-    .title-row h1 {
-        font-size: 2.8rem;
-        line-height: 2.8rem;
-        margin: 0;
-    }
-    .actions {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-    }
-    .table-header {
-        background-color: #f0f2f6;
-        font-weight: bold;
-        border-bottom: 1px solid #ccc;
-        padding: 0.5rem 0;
-    }
-    .table-row {
-        border-bottom: 1px solid #e6e6e6;
-        padding: 0.5rem 0;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    with col_titulo:
+        st.markdown("### 🏢 Fornecedores")
 
-    st.markdown("""
-    <div class='title-row'>
-        <h1>🏢 Fornecedores</h1>
-        <div class='actions'>
-            <button onclick="window.location.href='?cadastrar=true'" style='height: 2.2rem;'>➕ Cadastrar Novo Fornecedor</button>
-            <input type='text' id='busca' name='busca' placeholder='Buscar...' style='height: 2.2rem; padding: 0 0.5rem;' />
-            <button style='height: 2.2rem;'>🔍</button>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    with col_btn:
+        if st.button("➕ Cadastrar Novo Fornecedor"):
+            st.session_state.cadastrando = True
+
+    with col_pesquisa:
+        busca = st.text_input("Pesquisar", label_visibility="collapsed")
+
+    with col_lupa:
+        st.write("")
+        st.button("🔍")
 
     if st.session_state.cadastrando:
         with st.expander("➕ Cadastrar Novo Fornecedor", expanded=True):
@@ -130,20 +100,20 @@ def renderizar_fornecedores():
     st.markdown("### Lista de Fornecedores")
 
     col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
-    col1.markdown("<div class='table-header'>Razão Social</div>", unsafe_allow_html=True)
-    col2.markdown("<div class='table-header'>Fantasia</div>", unsafe_allow_html=True)
-    col3.markdown("<div class='table-header'>CNPJ</div>", unsafe_allow_html=True)
-    col4.markdown("<div class='table-header'>E-mail</div>", unsafe_allow_html=True)
-    col5.markdown("<div class='table-header'>Telefone</div>", unsafe_allow_html=True)
-    col6.markdown("<div class='table-header'>Ações</div>", unsafe_allow_html=True)
+    col1.markdown("**Razão Social**")
+    col2.markdown("**Fantasia**")
+    col3.markdown("**CNPJ**")
+    col4.markdown("**E-mail**")
+    col5.markdown("**Telefone**")
+    col6.markdown("**Ações**")
 
     for i, row in fornecedores.iterrows():
         col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
-        col1.markdown(f"<div class='table-row'>{row['razao_social']}</div>", unsafe_allow_html=True)
-        col2.markdown(f"<div class='table-row'>{row['nome_fantasia']}</div>", unsafe_allow_html=True)
-        col3.markdown(f"<div class='table-row'>{row['cnpj']}</div>", unsafe_allow_html=True)
-        col4.markdown(f"<div class='table-row'>{row['email']}</div>", unsafe_allow_html=True)
-        col5.markdown(f"<div class='table-row'>{row['telefone']}</div>", unsafe_allow_html=True)
+        col1.write(row["razao_social"])
+        col2.write(row["nome_fantasia"])
+        col3.write(row["cnpj"])
+        col4.write(row["email"])
+        col5.write(row["telefone"])
         with col6:
             if st.button("🔍", key=f"ver_{i}"):
                 st.session_state.visualizando = i
