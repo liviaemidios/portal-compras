@@ -22,10 +22,6 @@ if usuario is None:
 if "pagina" not in st.session_state:
     st.session_state.pagina = "dashboard"
 
-# Verifica parâmetro da URL
-if "pagina" in st.query_params:
-    st.session_state.pagina = st.query_params["pagina"]
-
 # Estilo do menu
 st.markdown("""
 <style>
@@ -49,14 +45,6 @@ st.markdown("""
     color: white;
     font-weight: bold;
 }
-.acao-botao {
-    font-size: 1.1em;
-    padding: 2px 8px;
-    margin: 0 2px;
-    border: none;
-    background: none;
-    cursor: pointer;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -71,13 +59,9 @@ menu = {
 with st.sidebar:
     st.markdown(f"**Usuário:** {usuario['nome']}")
     st.markdown("---")
-
     for nome, valor in menu.items():
-        ativo = "active" if st.session_state.pagina == valor else ""
-        st.markdown(
-            f"<div class='sidebar-button {ativo}' onclick=\"window.location.href='?pagina={valor}'\">{nome}</div>",
-            unsafe_allow_html=True
-        )
+        if st.button(nome):
+            st.session_state.pagina = valor
 
 # Conteúdo das páginas
 if st.session_state.pagina == "dashboard":
