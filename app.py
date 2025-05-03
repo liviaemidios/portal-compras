@@ -40,6 +40,11 @@ st.markdown("""
     gap: 1rem;
     margin-bottom: 1rem;
 }
+.align-center h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    line-height: 2.2rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -60,11 +65,9 @@ if st.session_state.pagina == "fornecedores":
     with st.container():
         st.markdown("""
         <div class='align-center'>
-            <h1 style='margin: 0;'>🏢 Fornecedores</h1>
-            <form action='#'>
-                <button type='submit'>➕ Cadastrar Novo Fornecedor</button>
-            </form>
-            <input type='text' placeholder='Buscar...' style='height: 2.2rem; padding: 0 0.5rem;'/>
+            <h1>🏢 Fornecedores</h1>
+            <button onclick="document.getElementById('cadastrar').click()">➕ Cadastrar Novo Fornecedor</button>
+            <input type='text' id='busca' name='busca' placeholder='Buscar...' style='height: 2.2rem; padding: 0 0.5rem;' />
             <button style='height: 2.2rem;'>🔍</button>
         </div>
         """, unsafe_allow_html=True)
@@ -74,6 +77,9 @@ if st.session_state.pagina == "fornecedores":
     busca = st.session_state.get("busca", "")
     if busca:
         fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
+
+    if st.button("", key="cadastrar", help="Cadastrar Novo Fornecedor"):
+        st.session_state.editando = -1
 
     st.markdown("### Lista de Fornecedores")
     st.markdown("| Razão Social | Fantasia | CNPJ | E-mail | Telefone | Ações |")
