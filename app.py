@@ -31,7 +31,8 @@ st.markdown("""
     margin: 0 0.2rem;
 }
 .search-box input {
-    width: 300px !important;
+    width: 200px !important;
+    display: inline;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -54,14 +55,16 @@ if st.session_state.pagina == "fornecedores":
 
     fornecedores = carregar_fornecedores()
 
-    col1, col2 = st.columns([1, 2])
+    col1, col2, col3 = st.columns([1, 2, 0.2])
     with col1:
         if st.button("➕ Cadastrar Novo Fornecedor"):
             st.session_state.editando = -1
     with col2:
-        busca = st.text_input("", label_visibility="collapsed", placeholder="Buscar fornecedor... 🔍", key="busca")
+        busca = st.text_input("", label_visibility="collapsed", placeholder="Buscar fornecedor...", key="busca")
+    with col3:
+        buscar_botao = st.button("🔍", key="botao_busca")
 
-    if busca:
+    if busca and buscar_botao:
         fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
 
     st.markdown("### Lista de Fornecedores")
