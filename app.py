@@ -7,20 +7,24 @@ CAMINHO_USUARIOS = "database/usuarios.csv"
 
 st.set_page_config(page_title="Portal de Compras", layout="wide")
 
+# Recupera usuário da URL se a sessão tiver sido reiniciada
 query_params = st.query_params
 if "usuario" not in st.session_state or not st.session_state.get("usuario"):
     if "usuario" in query_params:
         st.session_state.usuario = query_params["usuario"]
 
+# 👉 Verifica se o usuário está logado, senão mostra login e para execução
 if not st.session_state.get("usuario"):
     login_page()
     st.stop()
 
+# Usuário logado com sucesso
 usuario = get_current_user()
 if usuario is None:
     st.error("Erro: não foi possível carregar os dados do usuário.")
     st.stop()
 
+# Página inicial
 if "pagina" not in st.session_state:
     st.session_state.pagina = "dashboard"
 
@@ -50,6 +54,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Menu lateral
 menu = {
     "🏠 Dashboard": "dashboard",
     "🏢 Fornecedores": "fornecedores",
@@ -60,7 +65,6 @@ menu = {
     "🚪 Sair": "sair"
 }
 
-# Sidebar (menu lateral)
 with st.sidebar:
     st.markdown(f"**Usuário:** {usuario['nome']}")
     foto = usuario.get("foto")
@@ -79,7 +83,7 @@ with st.sidebar:
         if st.markdown(f"<a class='sidebar-button {ativo}' href='#' onclick=\"window.location.reload()\">{nome}</a>", unsafe_allow_html=True):
             st.session_state.pagina = valor
 
-# Conteúdo da página
+# Conteúdo principal
 if st.session_state.pagina == "dashboard":
     st.image("logo.png", width=200)
     st.title("Bem-vindo ao Portal de Compras Internas")
