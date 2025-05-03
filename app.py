@@ -54,12 +54,12 @@ if st.session_state.pagina == "fornecedores":
 
     fornecedores = carregar_fornecedores()
 
-    col1, _ = st.columns([1, 3])
+    col1, col2 = st.columns([2, 1])
     with col1:
-        busca = st.text_input("Buscar", label_visibility="collapsed", placeholder="Buscar fornecedor...", key="busca")
-
-    if st.button("➕ Cadastrar Novo Fornecedor"):
-        st.session_state.editando = -1
+        busca = st.text_input("", label_visibility="collapsed", placeholder="Buscar fornecedor...", key="busca")
+    with col2:
+        if st.button("➕ Cadastrar Novo Fornecedor"):
+            st.session_state.editando = -1
 
     if busca:
         fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
@@ -86,7 +86,6 @@ if st.session_state.pagina == "fornecedores":
                 st.success("Fornecedor excluído com sucesso.")
                 st.rerun()
 
-    # Modal de visualização
     if st.session_state.visualizando is not None:
         fornecedor = fornecedores.loc[st.session_state.visualizando]
         with st.expander("🔍 Detalhes do Fornecedor", expanded=True):
@@ -99,7 +98,6 @@ if st.session_state.pagina == "fornecedores":
             if st.button("Fechar visualização"):
                 st.session_state.visualizando = None
 
-    # Modal de edição
     if st.session_state.editando is not None:
         if st.session_state.editando == -1:
             dados = {"razao_social": "", "nome_fantasia": "", "cnpj": "", "telefone": "", "email": "", "endereco": ""}
