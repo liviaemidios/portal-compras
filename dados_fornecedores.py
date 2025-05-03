@@ -1,15 +1,29 @@
+# dados_fornecedores.py
 import pandas as pd
 import os
 
-CAMINHO_FORNECEDORES = "database/fornecedores.csv"
+def inicializar_csv_fornecedores():
+    caminho = "database/fornecedores.csv"
+    if not os.path.exists("database"):
+        os.makedirs("database")
+    if not os.path.exists(caminho):
+        df = pd.DataFrame(columns=[
+            "razao_social",
+            "nome_fantasia",
+            "cnpj",
+            "telefone",
+            "email",
+            "endereco",
+            "inscricao_estadual",
+            "inscricao_municipal",
+            "pedido_minimo",
+            "prazo_pagamento"
+        ])
+        df.to_csv(caminho, index=False)
 
 def carregar_fornecedores():
-    if os.path.exists(CAMINHO_FORNECEDORES):
-        return pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
-    return pd.DataFrame(columns=[
-        "razao_social", "nome_fantasia", "cnpj", "telefone", "email", "endereco",
-        "inscricao_estadual", "inscricao_municipal", "pedido_minimo", "prazo_pagamento"
-    ])
+    inicializar_csv_fornecedores()
+    return pd.read_csv("database/fornecedores.csv")
 
 def salvar_fornecedores(df):
-    df.to_csv(CAMINHO_FORNECEDORES, index=False)
+    df.to_csv("database/fornecedores.csv", index=False)
