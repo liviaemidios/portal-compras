@@ -37,13 +37,14 @@ def renderizar_fornecedores():
     if "cadastrando" not in st.session_state:
         st.session_state.cadastrando = False
 
-    # Cabeçalho com título à esquerda e busca à direita
-    col1, col2, col3, col4 = st.columns([2.5, 1.8, 5, 0.7])
+    # Cabeçalho: tudo na mesma linha
+    col1, col2, col3, col4 = st.columns([3, 2.5, 3.5, 0.5])
 
     with col1:
-        st.markdown("## 🏢 Fornecedores")
+        st.markdown("<h4 style='margin-top: 0.8em;'>🏢 Fornecedores</h4>", unsafe_allow_html=True)
 
     with col2:
+        st.write("")  # alinhar o botão com o título
         if st.button("➕ Cadastrar"):
             st.session_state.cadastrando = True
 
