@@ -22,15 +22,7 @@ if usuario is None:
 if "pagina" not in st.session_state:
     st.session_state.pagina = "dashboard"
 
-# MENU DEFINIDO AQUI
-menu = {
-    "🏠 Dashboard": "dashboard",
-    "🏢 Fornecedores": "fornecedores",
-    "👤 Meu Perfil": "perfil",
-    "🚪 Sair": "sair"
-}
-
-# ESTILO DO MENU
+# Estilo do menu
 st.markdown("""
 <style>
     .stButton > button {
@@ -56,10 +48,18 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# MENU LATERAL FUNCIONAL
+# Menu lateral
+menu = {
+    "🏠 Dashboard": "dashboard",
+    "🏢 Fornecedores": "fornecedores",
+    "👤 Meu Perfil": "perfil",
+    "🚪 Sair": "sair"
+}
+
 with st.sidebar:
     st.markdown(f"**Usuário:** {usuario['nome']}")
     st.markdown("---")
+
     for nome, valor in menu.items():
         container = st.container()
         if st.session_state.pagina == valor:
@@ -75,7 +75,7 @@ with st.sidebar:
                     st.session_state.pagina = valor
                 st.markdown('</div>', unsafe_allow_html=True)
 
-# CONTEÚDO DAS PÁGINAS
+# Conteúdo das páginas
 if st.session_state.pagina == "dashboard":
     st.title("📊 Dashboard")
     st.success(f"Bem-vinda, {usuario['nome']}!")
@@ -86,42 +86,66 @@ elif st.session_state.pagina == "fornecedores":
 
     if "mostrar_formulario" not in st.session_state:
         st.session_state.mostrar_formulario = False
+    if "editando" not in st.session_state:
+        st.session_state.editando = None
 
     if st.button("➕ Cadastrar Novo Fornecedor"):
         st.session_state.mostrar_formulario = not st.session_state.mostrar_formulario
+        st.session_state.editando = None
 
-    if st.session_state.mostrar_formulario:
+    if st.session_state.mostrar_formulario or st.session_state.editando is not None:
         st.subheader("📋 Cadastro de Fornecedor")
-        with st.form("form_fornecedor"):
-            cnpj = st.text_input("CNPJ")
-            nome = st.text_input("Nome da Empresa")
-            email = st.text_input("E-mail")
-            telefone = st.text_input("Telefone")
-            endereco = st.text_area("Endereço")
-            submit = st.form_submit_button("Salvar")
 
-            if submit:
-                novo = pd.DataFrame([{
-                    "cnpj": cnpj,
-                    "nome": nome,
-                    "email": email,
-                    "telefone": telefone,
-                    "endereco": endereco
-                }])
-                if os.path.exists(CAMINHO_FORNECEDORES):
-                    df_antigo = pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
-                    df_final = pd.concat([df_antigo, novo], ignore_index=True)
-                else:
-                    df_final = novo
-                df_final.to_csv(CAMINHO_FORNECEDORES, index=False)
-                st.success("Fornecedor cadastrado com sucesso!")
+        fornecedores_df = pd.read_csv(CAMINHO_FORNECEDORES, dtype=str) if os.path.exists(CAMINHO_FORNECEDORES) else pd.DataFrame(columns=["cnpj", "nome", "email", "telefone", "endereco"])
+
+        if st.session_state.editando is not None:
+            dados = fornecedores_df.loc[st.session_state.editando]
+            cnpj = st.text_input("CNPJ", value=dados["cnpj"])
+            nome = st.text_input("Nome da Empresa", value=dados["nome"])
+            email = st.text_input("E-mail", value=dados["email"])
+            telefone = st.text_input("Telefone", value=dados["telefone"])
+            endereco = st.text_area("Endereço", value=dados["endereco"])
+            botao_salvar = st.button("💾 Salvar Alterações")
+
+            if botao_salvar:
+                fornecedores_df.loc[st.session_state.editando] = [cnpj, nome, email, telefone, endereco]
+                fornecedores_df.to_csv(CAMINHO_FORNECEDORES, index=False)
+                st.success("Fornecedor atualizado com sucesso!")
+                st.session_state.editando = None
+                st.session_state.mostrar_formulario = False
                 st.rerun()
+        else:
+            with st.form("form_fornecedor"):
+                cnpj = st.text_input("CNPJ")
+                nome = st.text_input("Nome da Empresa")
+                email = st.text_input("E-mail")
+                telefone = st.text_input("Telefone")
+                endereco = st.text_area("Endereço")
+                submit = st.form_submit_button("Salvar")
+
+                if submit:
+                    novo = pd.DataFrame([{
+                        "cnpj": cnpj,
+                        "nome": nome,
+                        "email": email,
+                        "telefone": telefone,
+                        "endereco": endereco
+                    }])
+                    if os.path.exists(CAMINHO_FORNECEDORES):
+                        df_antigo = pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
+                        df_final = pd.concat([df_antigo, novo], ignore_index=True)
+                    else:
+                        df_final = novo
+                    df_final.to_csv(CAMINHO_FORNECEDORES, index=False)
+                    st.success("Fornecedor cadastrado com sucesso!")
+                    st.rerun()
 
     st.markdown("### 🔍 Buscar fornecedor")
     busca = st.text_input("Buscar por nome, CNPJ ou e-mail").lower()
 
     if os.path.exists(CAMINHO_FORNECEDORES):
         fornecedores = pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
+
         if busca:
             fornecedores = fornecedores[
                 fornecedores.apply(lambda row: busca in row.astype(str).str.lower().to_string(), axis=1)
@@ -129,14 +153,16 @@ elif st.session_state.pagina == "fornecedores":
 
         for i, row in fornecedores.iterrows():
             with st.container():
-                col1, col2, col3, col4 = st.columns([4, 3, 2, 3])
+                col1, col2, col3 = st.columns([5, 4, 3])
                 col1.markdown(f"**{row['nome']}**  \n📧 {row['email']}  \n📞 {row['telefone']}")
                 col2.markdown(f"CNPJ: {row['cnpj']}  \n📍 {row['endereco']}")
                 with col3:
                     if st.button("🔍", key=f"ver_{i}", help="Visualizar detalhes"):
                         st.info(f"Detalhes do fornecedor:\n{row.to_string()}")
-                    if st.button("✏️", key=f"edit_{i}", help="Editar (em breve)"):
-                        st.warning("Função de edição ainda não implementada.")
+                    if st.button("✏️", key=f"edit_{i}", help="Editar"):
+                        st.session_state.editando = i
+                        st.session_state.mostrar_formulario = True
+                        st.rerun()
                     if st.button("🗑️", key=f"del_{i}", help="Excluir"):
                         fornecedores = fornecedores.drop(i)
                         fornecedores.to_csv(CAMINHO_FORNECEDORES, index=False)
