@@ -12,6 +12,18 @@ CAMINHO_USUARIOS = "database/usuarios.csv"
 
 st.set_page_config(page_title="Portal de Compras", layout="wide")
 
+# Recuperar parâmetros da URL (backup para session_state)
+query_params = st.query_params
+
+# Força session_state.usuario com base na URL, se necessário
+if "usuario" not in st.session_state or not st.session_state.usuario:
+    if "usuario" in query_params:
+        st.session_state.usuario = query_params["usuario"]
+
+# Inicializa a página se ainda não estiver definida
+if "pagina" not in st.session_state:
+    st.session_state.pagina = "dashboard"
+
 st.markdown("""
 <style>
 .sidebar-button {
@@ -37,15 +49,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Inicialização segura
-query_params = st.query_params
-
-if "usuario" not in st.session_state:
-    st.session_state.usuario = query_params.get("usuario")
-
-if "pagina" not in st.session_state:
-    st.session_state.pagina = "dashboard"
-
 if st.session_state.usuario is None:
     login_page()
 else:
@@ -53,7 +56,6 @@ else:
 
     if usuario is None:
         st.error("Erro: não foi possível carregar os dados do usuário.")
-        st.write("DEBUG >> st.session_state.usuario:", st.session_state.get("usuario"))
         st.stop()
 
     menu = {
@@ -120,7 +122,7 @@ else:
 
                 df.at[idx, "cpf"] = cpf
                 df.at[idx, "rg"] = rg
-                df.at[idx, "data_nascimento"] = data_nasc
+                df.at[idx, "data_nascimento"] = str(data_nasc)
                 df.at[idx, "endereco"] = endereco
                 df.at[idx, "tel_fixo"] = fixo
                 df.at[idx, "tel_celular"] = celular
