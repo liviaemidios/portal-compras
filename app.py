@@ -12,9 +12,6 @@ CAMINHO_USUARIOS = "database/usuarios.csv"
 
 st.set_page_config(page_title="Portal de Compras", layout="wide")
 
-# DEBUG TEMPORÁRIO
-st.markdown("<small style='color:gray;'>Sessão: {}</small>".format(st.session_state.get("usuario", "Nenhum")), unsafe_allow_html=True)
-
 st.markdown("""
 <style>
 .sidebar-button {
@@ -40,8 +37,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Inicialização segura
+query_params = st.query_params
+
 if "usuario" not in st.session_state:
-    st.session_state.usuario = None
+    st.session_state.usuario = query_params.get("usuario")
+
 if "pagina" not in st.session_state:
     st.session_state.pagina = "dashboard"
 
