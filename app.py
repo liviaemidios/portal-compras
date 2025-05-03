@@ -78,10 +78,29 @@ if st.session_state.pagina == "dashboard":
 elif st.session_state.pagina == "fornecedores":
     st.title("🏢 Fornecedores")
 
-    st.button("➕ Cadastrar Novo Fornecedor")
-    busca = st.text_input("🔍 Buscar fornecedor")
+    if "mostrar_formulario" not in st.session_state:
+        st.session_state.mostrar_formulario = False
 
-    st.write("Lista de fornecedores aparecerá aqui...")
+    if st.button("➕ Cadastrar Novo Fornecedor"):
+        st.session_state.mostrar_formulario = not st.session_state.mostrar_formulario
+
+    if st.session_state.mostrar_formulario:
+        st.subheader("📋 Cadastro de Fornecedor")
+
+        with st.form("form_fornecedor"):
+            cnpj = st.text_input("CNPJ")
+            nome = st.text_input("Nome da Empresa")
+            email = st.text_input("E-mail")
+            telefone = st.text_input("Telefone")
+            endereco = st.text_area("Endereço")
+            submit = st.form_submit_button("Salvar")
+
+            if submit:
+                st.success("Fornecedor cadastrado com sucesso!")
+
+    st.markdown("### 🔍 Buscar fornecedor")
+    busca = st.text_input("Buscar por nome, CNPJ, email...")
+    st.write("📄 Lista de fornecedores aparecerá aqui...")
 
 elif st.session_state.pagina == "perfil":
     st.title("👤 Meu Perfil")
