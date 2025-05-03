@@ -37,13 +37,18 @@ st.markdown("""
 .title-row {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
     margin-bottom: 1rem;
 }
 .title-row h1 {
     font-size: 2.8rem;
     line-height: 2.8rem;
     margin: 0;
+}
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -62,21 +67,25 @@ if st.sidebar.button("🏢 Fornecedores"):
     st.session_state.pagina = "fornecedores"
 
 if st.session_state.pagina == "fornecedores":
-    col1, col2, col3, col4 = st.columns([2.5, 2, 1.5, 0.5])
-    with col1:
-        st.markdown("<h1 class='title-row'>🏢 Fornecedores</h1>", unsafe_allow_html=True)
-    with col2:
-        if st.button("➕ Cadastrar Novo Fornecedor", key="novo_fornecedor"):
-            st.session_state.editando = -1
-    with col3:
-        busca = st.text_input("", label_visibility="collapsed", placeholder="Buscar...", key="busca")
-    with col4:
-        buscar_botao = st.button("🔍", key="botao_busca")
+    st.markdown("""
+    <div class='title-row'>
+        <h1>🏢 Fornecedores</h1>
+        <div class='actions'>
+            <button onclick=\"window.location.reload();\">➕ Cadastrar Novo Fornecedor</button>
+            <input type='text' id='busca' name='busca' placeholder='Buscar...' style='height: 2.2rem; padding: 0 0.5rem;' />
+            <button style='height: 2.2rem;'>🔍</button>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     fornecedores = carregar_fornecedores()
 
-    if busca and buscar_botao:
+    busca = st.session_state.get("busca", "")
+    if busca:
         fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
+
+    if st.button("", key="novo_fornecedor", help="Cadastrar Novo Fornecedor"):
+        st.session_state.editando = -1
 
     st.markdown("### Lista de Fornecedores")
     st.markdown("| Razão Social | Fantasia | CNPJ | E-mail | Telefone | Ações |")
