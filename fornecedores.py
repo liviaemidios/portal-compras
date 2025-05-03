@@ -37,41 +37,54 @@ def renderizar_fornecedores():
     if "cadastrando" not in st.session_state:
         st.session_state.cadastrando = False
 
-    # Cabeçalho: tudo na mesma linha
+    # Cabeçalho alinhado
     col1, col2, col3, col4 = st.columns([3, 2.5, 3.5, 0.5])
-
     with col1:
         st.markdown("<h4 style='margin-top: 0.8em;'>🏢 Fornecedores</h4>", unsafe_allow_html=True)
-
     with col2:
-        st.write("")  # alinhar o botão com o título
+        st.write("")
         if st.button("➕ Cadastrar"):
             st.session_state.cadastrando = True
-
     with col3:
         busca = st.text_input("", placeholder="Pesquisar fornecedor...", label_visibility="collapsed")
-
     with col4:
         st.write("")
         st.button("🔍")
 
-    # Formulário de cadastro
+    # Simula modal
     if st.session_state.cadastrando:
-        with st.expander("➕ Cadastrar Novo Fornecedor", expanded=True):
+        st.markdown("""
+            <style>
+            .modal-container {
+                background-color: #f9f9f9;
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                border: 1px solid #ccc;
+                position: relative;
+                z-index: 999;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
+        with st.container():
+            st.markdown('<div class="modal-container">', unsafe_allow_html=True)
+            col_close, _ = st.columns([0.15, 5])
+            with col_close:
+                if st.button("❌ Fechar"):
+                    st.session_state.cadastrando = False
+                    st.stop()
+
             with st.form("form_cadastrar_fornecedor"):
-                st.subheader("Dados da Empresa")
+                st.subheader("Cadastro de Fornecedor")
                 razao_social = st.text_input("Razão Social")
                 nome_fantasia = st.text_input("Nome Fantasia")
                 cnpj = st.text_input("CNPJ")
                 inscricao_estadual = st.text_input("Inscrição Estadual")
                 inscricao_municipal = st.text_input("Inscrição Municipal")
-
-                st.subheader("Contato")
                 telefone = st.text_input("Telefone")
                 email = st.text_input("E-mail")
                 endereco = st.text_area("Endereço")
-
-                st.subheader("Condições Comerciais")
                 pedido_minimo = st.text_input("Valor Mínimo de Pedido")
                 prazo_pagamento = st.text_input("Prazo de Pagamento")
 
@@ -99,10 +112,12 @@ def renderizar_fornecedores():
                     st.session_state.cadastrando = False
                     st.session_state.rerun = True
                     st.stop()
-                elif cancelar:
+
+                if cancelar:
                     st.session_state.cadastrando = False
-                    st.session_state.rerun = True
                     st.stop()
+
+            st.markdown('</div>', unsafe_allow_html=True)
 
     fornecedores = carregar_fornecedores()
 
