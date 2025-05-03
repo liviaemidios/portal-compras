@@ -7,13 +7,43 @@ def renderizar_fornecedores():
         st.error("Acesso negado. Faça login para continuar.")
         st.stop()
 
-    # Cabeçalho
-    col1, col2, col3 = st.columns([3, 1.5, 2])
+    # Estilos adicionais
+    st.markdown("""
+        <style>
+            .titulo-header {
+                font-size: 24px;
+                font-weight: bold;
+                color: #3879bd;
+                margin-bottom: 0.5rem;
+            }
+            .botao-cadastrar {
+                margin-top: 1.6rem;
+            }
+            .setas-pequenas button {
+                font-size: 12px !important;
+                padding: 0.25rem 0.5rem !important;
+            }
+            .cabecalho-tabela {
+                background-color: #3879bd;
+                color: white;
+                padding: 6px;
+                border-radius: 5px;
+                text-align: center;
+                font-weight: bold;
+                font-size: 14px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Cabeçalho com título, botão e busca
+    col1, col2, col3 = st.columns([3, 1.5, 2.5])
     with col1:
-        st.markdown("## 🏢 Fornecedores")
+        st.markdown("<div class='titulo-header'>🏢 Fornecedores</div>", unsafe_allow_html=True)
     with col2:
+        st.markdown("<div class='botao-cadastrar'>", unsafe_allow_html=True)
         if st.button("➕ Cadastrar"):
             st.switch_page("formulario_fornecedor.py")
+        st.markdown("</div>", unsafe_allow_html=True)
     with col3:
         with st.form(key="form_busca"):
             col_search1, col_search2 = st.columns([4, 1])
@@ -40,11 +70,17 @@ def renderizar_fornecedores():
 
     col_pg1, col_pg2, col_pg3 = st.columns([8, 0.5, 0.5])
     with col_pg2:
-        if st.button("◀") and pagina > 1:
-            pagina -= 1
+        with st.container():
+            st.markdown("<div class='setas-pequenas'>", unsafe_allow_html=True)
+            if st.button("◀") and pagina > 1:
+                pagina -= 1
+            st.markdown("</div>", unsafe_allow_html=True)
     with col_pg3:
-        if st.button("▶") and pagina < paginas:
-            pagina += 1
+        with st.container():
+            st.markdown("<div class='setas-pequenas'>", unsafe_allow_html=True)
+            if st.button("▶") and pagina < paginas:
+                pagina += 1
+            st.markdown("</div>", unsafe_allow_html=True)
     st.session_state["pagina_fornecedores"] = pagina
 
     inicio = (pagina - 1) * por_pagina
@@ -56,7 +92,7 @@ def renderizar_fornecedores():
     header_cols = st.columns([3, 2, 2.5, 2.5, 2, 1])
     headers = ["Razão Social", "Fantasia", "CNPJ", "E-mail", "Telefone", "Ações"]
     for col, header in zip(header_cols, headers):
-        col.markdown(f"**{header}**")
+        col.markdown(f"<div class='cabecalho-tabela'>{header}</div>", unsafe_allow_html=True)
 
     for _, row in fornecedores_pag.iterrows():
         col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2.5, 2.5, 2, 1])
