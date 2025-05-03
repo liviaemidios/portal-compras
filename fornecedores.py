@@ -5,60 +5,6 @@ from login import login_page, get_current_user
 
 CAMINHO_FORNECEDORES = "database/fornecedores.csv"
 
-if not st.session_state.get("usuario"):
-    login_page()
-    st.stop()
-
-usuario = get_current_user()
-if usuario is None:
-    st.error("Erro ao carregar o usuário.")
-    st.stop()
-
-if "pagina" not in st.session_state:
-    st.session_state.pagina = "fornecedores"
-if "editando" not in st.session_state:
-    st.session_state.editando = None
-if "visualizando" not in st.session_state:
-    st.session_state.visualizando = None
-if "cadastrando" not in st.session_state:
-    st.session_state.cadastrando = False
-
-query_params = st.query_params
-if query_params.get("cadastrar") == ["true"]:
-    st.session_state.cadastrando = True
-    st.query_params.clear()
-
-st.markdown("""
-<style>
-.title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-}
-.title-row h1 {
-    font-size: 2.8rem;
-    line-height: 2.8rem;
-    margin: 0;
-}
-.actions {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-.table-header {
-    background-color: #f0f2f6;
-    font-weight: bold;
-    border-bottom: 1px solid #ccc;
-    padding: 0.5rem 0;
-}
-.table-row {
-    border-bottom: 1px solid #e6e6e6;
-    padding: 0.5rem 0;
-}
-</style>
-""", unsafe_allow_html=True)
-
 def carregar_fornecedores():
     if os.path.exists(CAMINHO_FORNECEDORES):
         return pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
@@ -70,7 +16,59 @@ def carregar_fornecedores():
 def salvar_fornecedores(df):
     df.to_csv(CAMINHO_FORNECEDORES, index=False)
 
-if st.session_state.pagina == "fornecedores":
+def renderizar_fornecedores():
+    if not st.session_state.get("usuario"):
+        login_page()
+        st.stop()
+
+    usuario = get_current_user()
+    if usuario is None:
+        st.error("Erro ao carregar o usuário.")
+        st.stop()
+
+    if "editando" not in st.session_state:
+        st.session_state.editando = None
+    if "visualizando" not in st.session_state:
+        st.session_state.visualizando = None
+    if "cadastrando" not in st.session_state:
+        st.session_state.cadastrando = False
+
+    query_params = st.query_params
+    if query_params.get("cadastrar") == ["true"]:
+        st.session_state.cadastrando = True
+        st.query_params.clear()
+
+    st.markdown("""
+    <style>
+    .title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    .title-row h1 {
+        font-size: 2.8rem;
+        line-height: 2.8rem;
+        margin: 0;
+    }
+    .actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    .table-header {
+        background-color: #f0f2f6;
+        font-weight: bold;
+        border-bottom: 1px solid #ccc;
+        padding: 0.5rem 0;
+    }
+    .table-row {
+        border-bottom: 1px solid #e6e6e6;
+        padding: 0.5rem 0;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     st.markdown("""
     <div class='title-row'>
         <h1>🏢 Fornecedores</h1>
