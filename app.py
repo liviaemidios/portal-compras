@@ -12,19 +12,54 @@ CAMINHO_USUARIOS = "database/usuarios.csv"
 
 st.set_page_config(page_title="Portal de Compras", layout="wide")
 
+# === ESTILOS PERSONALIZADOS ===
+st.markdown("""
+<style>
+.sidebar-button {
+    display: block;
+    padding: 0.6rem 1rem;
+    margin: 0.3rem 0;
+    background-color: #e9f2fb;
+    border-radius: 8px;
+    color: #003366;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+.sidebar-button:hover {
+    background-color: #d8e7f9;
+    cursor: pointer;
+}
+.sidebar-button.active {
+    background-color: #3879bd;
+    color: white;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
+
 if "usuario" not in st.session_state:
     st.session_state.usuario = None
 if "pagina" not in st.session_state:
-    st.session_state.pagina = None
+    st.session_state.pagina = "dashboard"
 
 if st.session_state.usuario is None:
     login_page()
 else:
     usuario = get_current_user()
 
+    menu = {
+        "🏠 Dashboard": "dashboard",
+        "🏢 Fornecedores": "fornecedores",
+        "🚚 Distribuidoras": "distribuidoras",
+        "📦 Produtos": "produtos",
+        "💰 Comparador de Preços": "comparador",
+        "📊 Relatórios": "relatorios",
+        "🚪 Sair": "sair"
+    }
+
     with st.sidebar:
         st.markdown(f"**Usuário:** {usuario['nome']}")
-
         foto = usuario.get("foto")
         if isinstance(foto, str) and foto.strip() and os.path.exists(foto):
             st.image(foto, width=120)
@@ -34,20 +69,16 @@ else:
         if st.button("👤 Meu Perfil"):
             st.session_state.pagina = "meu_perfil"
 
-        pagina = st.radio("Menu", [
-            "🏠 Dashboard",
-            "🏢 Fornecedores",
-            "🚚 Distribuidoras",
-            "📦 Produtos",
-            "💰 Comparador de Preços",
-            "📊 Relatórios",
-            "🚪 Sair"
-        ])
+        st.markdown("---")
+
+        for nome, valor in menu.items():
+            ativo = "active" if st.session_state.pagina == valor else ""
+            if st.markdown(f"<a class='sidebar-button {ativo}' href='#' onclick=\"window.location.reload()\">{nome}</a>", unsafe_allow_html=True):
+                st.session_state.pagina = valor
 
     if st.session_state.pagina == "meu_perfil":
         st.subheader("👤 Meu Perfil")
 
-        foto = usuario.get("foto")
         if isinstance(foto, str) and foto.strip() and os.path.exists(foto):
             st.image(foto, width=150)
             if st.button("🗑️ Remover Foto"):
@@ -98,32 +129,27 @@ else:
                 st.session_state.pagina = None
                 st.rerun()
 
-    elif pagina == "🏠 Dashboard":
+    elif st.session_state.pagina == "dashboard":
         st.image("logo.png", width=200)
         st.title("Bem-vindo ao Portal de Compras Internas")
         st.info("Selecione uma das opções no menu à esquerda.")
 
-    elif pagina == "🏢 Fornecedores":
-        st.session_state.pagina = None
+    elif st.session_state.pagina == "fornecedores":
         pagina_fornecedores()
 
-    elif pagina == "🚚 Distribuidoras":
-        st.session_state.pagina = None
+    elif st.session_state.pagina == "distribuidoras":
         pagina_distribuidoras()
 
-    elif pagina == "📦 Produtos":
-        st.session_state.pagina = None
+    elif st.session_state.pagina == "produtos":
         pagina_produtos()
 
-    elif pagina == "💰 Comparador de Preços":
-        st.session_state.pagina = None
+    elif st.session_state.pagina == "comparador":
         pagina_comparador()
 
-    elif pagina == "📊 Relatórios":
-        st.session_state.pagina = None
+    elif st.session_state.pagina == "relatorios":
         pagina_relatorios()
 
-    elif pagina == "🚪 Sair":
+    elif st.session_state.pagina == "sair":
         st.session_state.usuario = None
         st.session_state.pagina = None
         st.rerun()
