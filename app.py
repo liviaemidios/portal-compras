@@ -34,6 +34,9 @@ st.markdown("""
     width: 150px !important;
     display: inline;
 }
+.title-aligned h1 {
+    margin-bottom: 0.4rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -53,7 +56,7 @@ if st.sidebar.button("🏢 Fornecedores"):
 if st.session_state.pagina == "fornecedores":
     col_t1, col_t2, col_t3, col_t4 = st.columns([2, 2, 1.5, 0.3])
     with col_t1:
-        st.title("🏢 Fornecedores")
+        st.markdown("<div class='title-aligned'><h1>🏢 Fornecedores</h1></div>", unsafe_allow_html=True)
     with col_t2:
         if st.button("➕ Cadastrar Novo Fornecedor"):
             st.session_state.editando = -1
