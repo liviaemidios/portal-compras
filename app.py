@@ -16,7 +16,7 @@ st.set_page_config(page_title="Portal de Compras", layout="wide")
 query_params = st.query_params
 
 # Força session_state.usuario com base na URL, se necessário
-if "usuario" not in st.session_state or not st.session_state.usuario:
+if "usuario" not in st.session_state or not st.session_state.get("usuario"):
     if "usuario" in query_params:
         st.session_state.usuario = query_params["usuario"]
 
@@ -49,7 +49,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-if st.session_state.usuario is None:
+if st.session_state.get("usuario") is None:
     login_page()
 else:
     usuario = get_current_user()
