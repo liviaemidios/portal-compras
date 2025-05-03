@@ -4,31 +4,30 @@ import pandas as pd
 import os
 
 CAMINHO_USUARIOS = "database/usuarios.csv"
-
 st.set_page_config(page_title="Portal de Compras", layout="wide")
 
-# Recupera usuário da URL se a sessão tiver sido reiniciada
+# Recuperar login pela URL se necessário
 query_params = st.query_params
 if "usuario" not in st.session_state or not st.session_state.get("usuario"):
     if "usuario" in query_params:
         st.session_state.usuario = query_params["usuario"]
 
-# 👉 Verifica se o usuário está logado, senão mostra login e para execução
+# Tela de login se não autenticado
 if not st.session_state.get("usuario"):
     login_page()
     st.stop()
 
-# Usuário logado com sucesso
+# Carrega dados do usuário logado
 usuario = get_current_user()
 if usuario is None:
-    st.error("Erro: não foi possível carregar os dados do usuário.")
+    st.error("Erro ao carregar o usuário.")
     st.stop()
 
-# Página inicial
+# Página ativa
 if "pagina" not in st.session_state:
     st.session_state.pagina = "dashboard"
 
-# Estilo do menu
+# Estilo menu lateral
 st.markdown("""
 <style>
 .sidebar-button {
@@ -57,11 +56,6 @@ st.markdown("""
 # Menu lateral
 menu = {
     "🏠 Dashboard": "dashboard",
-    "🏢 Fornecedores": "fornecedores",
-    "🚚 Distribuidoras": "distribuidoras",
-    "📦 Produtos": "produtos",
-    "💰 Comparador de Preços": "comparador",
-    "📊 Relatórios": "relatorios",
     "🚪 Sair": "sair"
 }
 
@@ -77,7 +71,6 @@ with st.sidebar:
         st.session_state.pagina = "meu_perfil"
 
     st.markdown("---")
-
     for nome, valor in menu.items():
         ativo = "active" if st.session_state.pagina == valor else ""
         if st.markdown(f"<a class='sidebar-button {ativo}' href='#' onclick=\"window.location.reload()\">{nome}</a>", unsafe_allow_html=True):
@@ -91,61 +84,12 @@ if st.session_state.pagina == "dashboard":
 
 elif st.session_state.pagina == "meu_perfil":
     st.subheader("👤 Meu Perfil")
-
-    if isinstance(foto, str) and foto.strip() and os.path.exists(foto):
-        st.image(foto, width=150)
-        if st.button("🗑️ Remover Foto"):
-            try:
-                os.remove(foto)
-            except:
-                pass
-            df = pd.read_csv(CAMINHO_USUARIOS, dtype=str)
-            df.loc[df["usuario"] == st.session_state.usuario, "foto"] = ""
-            df.to_csv(CAMINHO_USUARIOS, index=False)
-            st.success("Foto removida com sucesso.")
-            st.rerun()
-    else:
-        st.info("Nenhuma foto de perfil cadastrada.")
-
-    st.markdown(f"**Nome:** {usuario['nome']}")
-    st.markdown(f"**E-mail:** {usuario['email']}")
-
-    with st.form("form_perfil"):
-        cpf = st.text_input("CPF", value=usuario.get("cpf", ""))
-        rg = st.text_input("RG", value=usuario.get("rg", ""))
-        data_nasc = st.date_input("Data de Nascimento", value=pd.to_datetime(usuario.get("data_nascimento", "2000-01-01")))
-        endereco = st.text_area("Endereço", value=usuario.get("endereco", ""))
-        fixo = st.text_input("Telefone Fixo", value=usuario.get("tel_fixo", ""))
-        celular = st.text_input("Telefone Celular", value=usuario.get("tel_celular", ""))
-
-        nova_foto = st.file_uploader("Atualizar Foto de Perfil", type=["png", "jpg", "jpeg"])
-        if st.form_submit_button("Salvar Perfil"):
-            df = pd.read_csv(CAMINHO_USUARIOS, dtype=str)
-            idx = df[df["usuario"] == st.session_state.usuario].index[0]
-
-            df.at[idx, "cpf"] = cpf
-            df.at[idx, "rg"] = rg
-            df.at[idx, "data_nascimento"] = str(data_nasc)
-            df.at[idx, "endereco"] = endereco
-            df.at[idx, "tel_fixo"] = fixo
-            df.at[idx, "tel_celular"] = celular
-
-            if nova_foto:
-                os.makedirs("fotos_perfil", exist_ok=True)
-                caminho_foto = f"fotos_perfil/{st.session_state.usuario}.jpg"
-                with open(caminho_foto, "wb") as f:
-                    f.write(nova_foto.getbuffer())
-                df.at[idx, "foto"] = caminho_foto
-
-            df.to_csv(CAMINHO_USUARIOS, index=False)
-            st.success("Perfil atualizado com sucesso!")
-            st.session_state.pagina = None
-            st.rerun()
+    st.write(f"Nome: {usuario['nome']}")
+    st.write(f"E-mail: {usuario['email']}")
+    st.write(f"CPF: {usuario.get('cpf', '')}")
+    st.write(f"Telefone: {usuario.get('tel_celular', '')}")
 
 elif st.session_state.pagina == "sair":
     st.session_state.usuario = None
     st.session_state.pagina = None
     st.rerun()
-
-else:
-    st.warning("Esta página ainda está em desenvolvimento.")
