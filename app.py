@@ -25,6 +25,12 @@ if "visualizando" not in st.session_state:
 if "cadastrando" not in st.session_state:
     st.session_state.cadastrando = False
 
+# Detectar se o parâmetro 'cadastrar=true' está na URL
+query_params = st.experimental_get_query_params()
+if query_params.get("cadastrar") == ["true"]:
+    st.session_state.cadastrando = True
+    st.experimental_set_query_params()
+
 st.markdown("""
 <style>
 .small-icon {
@@ -65,13 +71,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
 def carregar_fornecedores():
     if os.path.exists(CAMINHO_FORNECEDORES):
         return pd.read_csv(CAMINHO_FORNECEDORES, dtype=str)
-    return pd.DataFrame(columns=["razao_social", "nome_fantasia", "cnpj", "telefone", "email", "endereco", "inscricao_estadual", "inscricao_municipal", "pedido_minimo", "prazo_pagamento"])
+    return pd.DataFrame(columns=[
+        "razao_social", "nome_fantasia", "cnpj", "telefone", "email", "endereco",
+        "inscricao_estadual", "inscricao_municipal", "pedido_minimo", "prazo_pagamento"
+    ])
+
 
 def salvar_fornecedores(df):
     df.to_csv(CAMINHO_FORNECEDORES, index=False)
+
 
 st.sidebar.markdown(f"**Usuário:** {usuario['nome']}")
 st.sidebar.markdown("---")
@@ -83,9 +95,7 @@ if st.session_state.pagina == "fornecedores":
     <div class='title-row'>
         <h1>🏢 Fornecedores</h1>
         <div class='actions'>
-            <form method='post'>
-                <button name='cadastrar' type='submit'>➕ Cadastrar Novo Fornecedor</button>
-            </form>
+            <button onclick="window.location.href='?cadastrar=true'" style='height: 2.2rem;'>➕ Cadastrar Novo Fornecedor</button>
             <input type='text' id='busca' name='busca' placeholder='Buscar...' style='height: 2.2rem; padding: 0 0.5rem;' />
             <button style='height: 2.2rem;'>🔍</button>
         </div>
@@ -133,18 +143,14 @@ if st.session_state.pagina == "fornecedores":
                     salvar_fornecedores(fornecedores)
                     st.success("Fornecedor cadastrado com sucesso!")
                     st.session_state.cadastrando = False
-                    st.rerun()
+                    st.experimental_rerun()
                 elif cancelar:
                     st.session_state.cadastrando = False
-                    st.rerun()
+                    st.experimental_rerun()
 
     fornecedores = carregar_fornecedores()
-
-    busca = st.session_state.get("busca", "")
-    if busca:
-        fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
-
     st.markdown("### Lista de Fornecedores")
+
     col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
     col1.markdown("<div class='table-header'>Razão Social</div>", unsafe_allow_html=True)
     col2.markdown("<div class='table-header'>Fantasia</div>", unsafe_allow_html=True)
@@ -169,20 +175,4 @@ if st.session_state.pagina == "fornecedores":
                 fornecedores = fornecedores.drop(i).reset_index(drop=True)
                 salvar_fornecedores(fornecedores)
                 st.success("Fornecedor excluído com sucesso.")
-                st.rerun()
-
-    if st.session_state.visualizando is not None:
-        fornecedor = fornecedores.loc[st.session_state.visualizando]
-        with st.expander("🔍 Detalhes do Fornecedor", expanded=True):
-            st.markdown(f"**Razão Social:** {fornecedor['razao_social']}")
-            st.markdown(f"**Fantasia:** {fornecedor['nome_fantasia']}")
-            st.markdown(f"**CNPJ:** {fornecedor['cnpj']}")
-            st.markdown(f"**E-mail:** {fornecedor['email']}")
-            st.markdown(f"**Telefone:** {fornecedor['telefone']}")
-            st.markdown(f"**Endereço:** {fornecedor['endereco']}")
-            st.markdown(f"**Inscrição Estadual:** {fornecedor.get('inscricao_estadual', '')}")
-            st.markdown(f"**Inscrição Municipal:** {fornecedor.get('inscricao_municipal', '')}")
-            st.markdown(f"**Pedido Mínimo:** {fornecedor.get('pedido_minimo', '')}")
-            st.markdown(f"**Prazo de Pagamento:** {fornecedor.get('prazo_pagamento', '')}")
-            if st.button("Fechar visualização"):
-                st.session_state.visualizando = None
+                st.experimental_rerun()
