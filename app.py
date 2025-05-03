@@ -50,6 +50,16 @@ st.markdown("""
     gap: 0.5rem;
     align-items: center;
 }
+.table-header {
+    background-color: #f0f2f6;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem 0;
+}
+.table-row {
+    border-bottom: 1px solid #e6e6e6;
+    padding: 0.5rem 0;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -85,16 +95,21 @@ if st.session_state.pagina == "fornecedores":
         fornecedores = fornecedores[fornecedores.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
 
     st.markdown("### Lista de Fornecedores")
-    st.markdown("| Razão Social | Fantasia | CNPJ | E-mail | Telefone | Ações |")
-    st.markdown("|--------------|----------|------|--------|----------|--------|")
+    col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
+    col1.markdown("<div class='table-header'>Razão Social</div>", unsafe_allow_html=True)
+    col2.markdown("<div class='table-header'>Fantasia</div>", unsafe_allow_html=True)
+    col3.markdown("<div class='table-header'>CNPJ</div>", unsafe_allow_html=True)
+    col4.markdown("<div class='table-header'>E-mail</div>", unsafe_allow_html=True)
+    col5.markdown("<div class='table-header'>Telefone</div>", unsafe_allow_html=True)
+    col6.markdown("<div class='table-header'>Ações</div>", unsafe_allow_html=True)
 
     for i, row in fornecedores.iterrows():
         col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
-        col1.markdown(row['razao_social'])
-        col2.markdown(row['nome_fantasia'])
-        col3.markdown(row['cnpj'])
-        col4.markdown(row['email'])
-        col5.markdown(row['telefone'])
+        col1.markdown(f"<div class='table-row'>{row['razao_social']}</div>", unsafe_allow_html=True)
+        col2.markdown(f"<div class='table-row'>{row['nome_fantasia']}</div>", unsafe_allow_html=True)
+        col3.markdown(f"<div class='table-row'>{row['cnpj']}</div>", unsafe_allow_html=True)
+        col4.markdown(f"<div class='table-row'>{row['email']}</div>", unsafe_allow_html=True)
+        col5.markdown(f"<div class='table-row'>{row['telefone']}</div>", unsafe_allow_html=True)
         with col6:
             if st.button("🔍", key=f"ver_{i}"):
                 st.session_state.visualizando = i
