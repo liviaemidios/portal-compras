@@ -16,11 +16,11 @@ if usuario is None:
     st.error("Erro ao carregar o usuário.")
     st.stop()
 
-# Controla a página ativa
+# Página ativa
 if "pagina" not in st.session_state:
     st.session_state.pagina = "dashboard"
 
-# Verifica se há parâmetro na URL
+# Verifica parâmetro da URL
 if "pagina" in st.query_params:
     st.session_state.pagina = st.query_params["pagina"]
 
@@ -53,6 +53,7 @@ st.markdown("""
 # Menu lateral
 menu = {
     "🏠 Dashboard": "dashboard",
+    "🏢 Fornecedores": "fornecedores",
     "👤 Meu Perfil": "perfil",
     "🚪 Sair": "sair"
 }
@@ -73,6 +74,14 @@ if st.session_state.pagina == "dashboard":
     st.title("📊 Dashboard")
     st.success(f"Bem-vinda, {usuario['nome']}!")
     st.info("Este é seu painel inicial.")
+
+elif st.session_state.pagina == "fornecedores":
+    st.title("🏢 Fornecedores")
+
+    st.button("➕ Cadastrar Novo Fornecedor")
+    busca = st.text_input("🔍 Buscar fornecedor")
+
+    st.write("Lista de fornecedores aparecerá aqui...")
 
 elif st.session_state.pagina == "perfil":
     st.title("👤 Meu Perfil")
