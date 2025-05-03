@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
-import os
 from login import login_page, get_current_user
 from formulario_fornecedor import mostrar_formulario_fornecedor
+from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
 
 CAMINHO_FORNECEDORES = "database/fornecedores.csv"
 
