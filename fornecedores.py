@@ -1,41 +1,127 @@
 import streamlit as st
 import pandas as pd
-import os
-from utils import carregar_csv, salvar_csv
+from login import login_page, get_current_user
+from formulario_fornecedor import mostrar_formulario_fornecedor
+from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
 
-CAMINHO_ARQUIVO = "database/fornecedores.csv"
+def renderizar_fornecedores():
+    if not st.session_state.get("usuario"):
+        login_page()
+        st.stop()
 
-def iniciar_csv():
-    if not os.path.exists(CAMINHO_ARQUIVO):
-        df = pd.DataFrame(columns=["CNPJ", "Nome", "Categoria", "Contato", "E-mail"])
-        df.to_csv(CAMINHO_ARQUIVO, index=False)
+    usuario = get_current_user()
+    if usuario is None:
+        st.error("Erro ao carregar o usuário.")
+        st.stop()
 
-def pagina_fornecedores():
-    st.title("📋 Lista de Fornecedores")
-    iniciar_csv()
-    df = carregar_csv(CAMINHO_ARQUIVO)
+    params = st.query_params
+    if "nova" in params:
+        mostrar_formulario_fornecedor(modo="novo")
+        return
 
-    if st.button("➕ Cadastrar novo fornecedor"):
-        st.session_state.modo = "novo"
+    if "editar" in params:
+        index = int(params["editar"])
+        dados = carregar_fornecedores().iloc[index].to_dict()
+        mostrar_formulario_fornecedor(modo="editar", dados=dados, index=index)
+        return
 
-    busca = st.text_input("🔎 Buscar fornecedor por nome ou CNPJ")
+    # Cabeçalho
+    col1, col2, col3, col4 = st.columns([3, 2.5, 3.5, 0.5])
+    with col1:
+        st.markdown("<h4 style='margin-top: 0.8em;'>🏢 Fornecedores</h4>", unsafe_allow_html=True)
+    with col2:
+        st.write("")
+        if st.button("➕ Cadastrar"):
+            st.query_params.update({"nova": "1"})
+            st.experimental_rerun()
+    with col3:
+        busca = st.text_input("", placeholder="Pesquisar fornecedor...", label_visibility="collapsed")
+    with col4:
+        st.write("")
+        st.button("🔍")
+
+    # Carregar e filtrar fornecedores
+    fornecedores = carregar_fornecedores()
+
     if busca:
-        df = df[df.apply(lambda row: busca.lower() in row.astype(str).str.lower().to_string(), axis=1)]
+        busca = busca.lower()
+        fornecedores = fornecedores[
+            fornecedores["razao_social"].str.lower().str.contains(busca)
+            | fornecedores["nome_fantasia"].str.lower().str.contains(busca)
+            | fornecedores["cnpj"].str.lower().str.contains(busca)
+            | fornecedores["email"].str.lower().str.contains(busca)
+            | fornecedores["telefone"].str.lower().str.contains(busca)
+        ]
 
-    st.dataframe(df, use_container_width=True)
+    fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
-    if "modo" in st.session_state and st.session_state.modo == "novo":
-        with st.form("form_cadastro"):
-            st.subheader("Cadastrar Fornecedor")
-            cnpj = st.text_input("CNPJ")
-            nome = st.text_input("Nome")
-            categoria = st.text_input("Categoria")
-            contato = st.text_input("Telefone ou WhatsApp")
-            email = st.text_input("E-mail")
-            if st.form_submit_button("Salvar"):
-                novo = pd.DataFrame([[cnpj, nome, categoria, contato, email]], columns=df.columns)
-                df = pd.concat([df, novo], ignore_index=True)
-                salvar_csv(CAMINHO_ARQUIVO, df)
-                st.success("Fornecedor cadastrado com sucesso!")
-                st.session_state.modo = None
-                st.rerun()
+    # Paginação
+    itens_por_pagina = 15
+    total = len(fornecedores)
+    pagina_atual = st.number_input("Página", min_value=1, max_value=max(1, (total - 1) // itens_por_pagina + 1), step=1)
+    inicio = (pagina_atual - 1) * itens_por_pagina
+    fim = inicio + itens_por_pagina
+    pagina_df = fornecedores.iloc[inicio:fim]
+
+    # Estilo visual
+    st.markdown(
+        """
+        <style>
+            .fornecedores-box {
+                border: 1px solid #d9d9d9;
+                background-color: #f9f9f9;
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 10px;
+            }
+            .fornecedores-header {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            .fornecedores-actions button {
+                padding: 0.1em 0.3em;
+                font-size: 0.8em;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown('<div class="fornecedores-box">', unsafe_allow_html=True)
+    st.markdown('<div class="fornecedores-header">📋 Lista de Fornecedores</div>', unsafe_allow_html=True)
+
+    # Cabeçalhos
+    col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
+    col1.markdown("**Razão Social**")
+    col2.markdown("**Fantasia**")
+    col3.markdown("**CNPJ**")
+    col4.markdown("**E-mail**")
+    col5.markdown("**Telefone**")
+    col6.markdown("**Ações**")
+
+    # Linhas
+    for i, row in pagina_df.iterrows():
+        col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
+        col1.write(row["razao_social"])
+        col2.write(row["nome_fantasia"])
+        col3.write(row["cnpj"])
+        col4.write(row["email"])
+        col5.write(row["telefone"])
+        with col6:
+            col_a, col_b, col_c = st.columns(3)
+            with col_a:
+                if st.button("🔍", key=f"ver_{i+inicio}"):
+                    st.session_state.visualizando = i + inicio
+            with col_b:
+                if st.button("✏️", key=f"edit_{i+inicio}"):
+                    st.query_params.update({"editar": str(i + inicio)})
+                    st.experimental_rerun()
+            with col_c:
+                if st.button("🗑️", key=f"del_{i+inicio}"):
+                    fornecedores = fornecedores.drop(i + inicio).reset_index(drop=True)
+                    salvar_fornecedores(fornecedores)
+                    st.success("Fornecedor excluído com sucesso.")
+                    st.experimental_rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
