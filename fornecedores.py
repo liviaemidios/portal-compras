@@ -37,23 +37,44 @@ def renderizar_fornecedores():
     if "cadastrando" not in st.session_state:
         st.session_state.cadastrando = False
 
-    # Cabeçalho com título, botão e campo de busca
-    col_titulo, col_btn, col_pesquisa, col_lupa = st.columns([3, 2, 4, 1])
+    st.markdown("""
+        <style>
+        .search-bar input {
+            height: 2.2rem;
+            padding: 0 0.5rem;
+            font-size: 0.9rem;
+        }
+        .search-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .search-row h2 {
+            font-size: 1.8rem;
+            margin: 0;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    with col_titulo:
-        st.markdown("### 🏢 Fornecedores")
+    # Linha superior com título, botão e campo de busca
+    col1, col2, col3, col4 = st.columns([2.5, 2, 2.5, 1])
 
-    with col_btn:
+    with col1:
+        st.markdown("## 🏢 Fornecedores")
+
+    with col2:
         if st.button("➕ Cadastrar Novo Fornecedor"):
             st.session_state.cadastrando = True
 
-    with col_pesquisa:
-        busca = st.text_input("Pesquisar", label_visibility="collapsed")
+    with col3:
+        busca = st.text_input("", placeholder="Pesquisar...", label_visibility="collapsed")
 
-    with col_lupa:
-        st.write("")
+    with col4:
+        st.write("")  # espaçamento
         st.button("🔍")
 
+    # Formulário de cadastro
     if st.session_state.cadastrando:
         with st.expander("➕ Cadastrar Novo Fornecedor", expanded=True):
             with st.form("form_cadastrar_fornecedor"):
@@ -97,12 +118,12 @@ def renderizar_fornecedores():
                     st.session_state.cadastrando = False
                     st.session_state.rerun = True
                     st.stop()
-
                 elif cancelar:
                     st.session_state.cadastrando = False
                     st.session_state.rerun = True
                     st.stop()
 
+    # Carrega fornecedores e mostra tabela
     fornecedores = carregar_fornecedores()
 
     col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2, 3, 2, 1])
