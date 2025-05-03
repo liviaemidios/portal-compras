@@ -12,7 +12,9 @@ CAMINHO_USUARIOS = "database/usuarios.csv"
 
 st.set_page_config(page_title="Portal de Compras", layout="wide")
 
-# === ESTILOS PERSONALIZADOS ===
+# DEBUG TEMPORÁRIO
+st.write("DEBUG >> Usuário logado:", st.session_state.get("usuario"))
+
 st.markdown("""
 <style>
 .sidebar-button {
@@ -47,6 +49,10 @@ if st.session_state.usuario is None:
     login_page()
 else:
     usuario = get_current_user()
+    if usuario is None:
+        st.session_state.usuario = None
+        st.session_state.pagina = None
+        st.rerun()
 
     menu = {
         "🏠 Dashboard": "dashboard",
