@@ -1,10 +1,10 @@
 import streamlit as st
 
-# ✅ Este comando precisa vir primeiro!
+# ✅ Deve vir logo no início
 st.set_page_config(page_title="Portal Interno de Compras", layout="wide")
 
 from login import login_page, get_current_user
-import fornecedores  # Importa o módulo com a tela de fornecedores
+import fornecedores as mod_fornecedores
 
 if "usuario" not in st.session_state:
     st.session_state.usuario = None
@@ -18,7 +18,6 @@ if usuario is None:
     st.error("Usuário não encontrado.")
     st.stop()
 
-# Página atual
 if "pagina" not in st.session_state:
     st.session_state.pagina = "inicio"
 
@@ -40,4 +39,4 @@ if st.session_state.pagina == "inicio":
     st.write("Use o menu lateral para navegar entre os módulos do sistema.")
 
 elif st.session_state.pagina == "fornecedores":
-    fornecedores  # executa o conteúdo do arquivo fornecedores.py
+    mod_fornecedores.renderizar_fornecedores()
