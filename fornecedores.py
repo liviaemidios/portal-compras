@@ -44,8 +44,8 @@ def renderizar_fornecedores():
         </style>
     """, unsafe_allow_html=True)
 
-    # Cabeçalho com título, botão e busca
-    col1, col2, col3 = st.columns([3, 1.5, 2.5])
+    # Cabeçalho com título e botão
+    col1, col2 = st.columns([4, 1.5])
     with col1:
         st.markdown("<div class='titulo-header'>🏢 Fornecedores</div>", unsafe_allow_html=True)
     with col2:
@@ -53,14 +53,35 @@ def renderizar_fornecedores():
         if st.button("➕ Cadastrar"):
             st.switch_page("formulario_fornecedor.py")
         st.markdown("</div>", unsafe_allow_html=True)
-    with col3:
+
+    # Carregar e filtrar dados
+    fornecedores = carregar_fornecedores()
+
+    # Paginação e campo de busca lado a lado
+    col_pag1, col_pag2, col_pag3, col_pag4 = st.columns([6, 0.5, 0.5, 3])
+    pagina = st.session_state.get("pagina_fornecedores", 1)
+
+    with col_pag2:
+        with st.container():
+            st.markdown("<div class='setas-pequenas'>", unsafe_allow_html=True)
+            if st.button("◀") and pagina > 1:
+                pagina -= 1
+            st.markdown("</div>", unsafe_allow_html=True)
+    with col_pag3:
+        with st.container():
+            st.markdown("<div class='setas-pequenas'>", unsafe_allow_html=True)
+            if st.button("▶") and pagina < max(1, (len(fornecedores) - 1) // 10 + 1):
+                pagina += 1
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    with col_pag4:
         with st.form(key="form_busca"):
             col_search1, col_search2 = st.columns([4, 1])
             busca = col_search1.text_input("", placeholder="Pesquisar...", label_visibility="collapsed")
             buscar = col_search2.form_submit_button("🔍")
 
-    # Carregar e filtrar dados
-    fornecedores = carregar_fornecedores()
+    st.session_state["pagina_fornecedores"] = pagina
+
     if busca:
         busca = busca.lower()
         fornecedores = fornecedores[
@@ -71,27 +92,10 @@ def renderizar_fornecedores():
 
     fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
-    # Paginação
+    # Paginação aplicada
     por_pagina = 10
     total = len(fornecedores)
     paginas = max(1, (total - 1) // por_pagina + 1)
-    pagina = st.session_state.get("pagina_fornecedores", 1)
-
-    col_pg1, col_pg2, col_pg3 = st.columns([8, 0.5, 0.5])
-    with col_pg2:
-        with st.container():
-            st.markdown("<div class='setas-pequenas'>", unsafe_allow_html=True)
-            if st.button("◀") and pagina > 1:
-                pagina -= 1
-            st.markdown("</div>", unsafe_allow_html=True)
-    with col_pg3:
-        with st.container():
-            st.markdown("<div class='setas-pequenas'>", unsafe_allow_html=True)
-            if st.button("▶") and pagina < paginas:
-                pagina += 1
-            st.markdown("</div>", unsafe_allow_html=True)
-    st.session_state["pagina_fornecedores"] = pagina
-
     inicio = (pagina - 1) * por_pagina
     fim = inicio + por_pagina
     fornecedores_pag = fornecedores.iloc[inicio:fim]
