@@ -1,8 +1,10 @@
 import streamlit as st
+
+# ✅ Este comando precisa vir primeiro!
+st.set_page_config(page_title="Portal Interno de Compras", layout="wide")
+
 from login import login_page, get_current_user
 import fornecedores  # Importa o módulo com a tela de fornecedores
-
-st.set_page_config(page_title="Portal Interno de Compras", layout="wide")
 
 if "usuario" not in st.session_state:
     st.session_state.usuario = None
