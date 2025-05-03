@@ -4,7 +4,6 @@ from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
 
 def mostrar_formulario_fornecedor(modo="novo", dados=None, index=None):
     titulo = "Cadastro de Fornecedor" if modo == "novo" else "Editar Fornecedor"
-    st.markdown("---")
     st.markdown(f"### {titulo}")
 
     with st.form(f"form_fornecedor_{modo}_{index}"):
@@ -44,11 +43,9 @@ def mostrar_formulario_fornecedor(modo="novo", dados=None, index=None):
                     df.at[index, campo] = novo[campo]
             salvar_fornecedores(df)
             st.success("Fornecedor salvo com sucesso!")
-            st.session_state.cadastrando = False
-            st.session_state.editando = None
+            st.experimental_set_query_params()  # limpa os parâmetros da URL
             st.rerun()
 
         if cancelar:
-            st.session_state.cadastrando = False
-            st.session_state.editando = None
+            st.experimental_set_query_params()  # limpa os parâmetros da URL
             st.rerun()
