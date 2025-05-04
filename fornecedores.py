@@ -25,25 +25,6 @@ def renderizar_fornecedores():
                 color: white;
                 display: inline-block;
             }
-            .top-bar .actions {
-                display: flex;
-                gap: 10px;
-            }
-            .top-bar .actions input[type="text"] {
-                padding: 6px 10px;
-                border-radius: 5px;
-                border: none;
-                width: 200px;
-            }
-            .top-bar .actions button {
-                padding: 6px 12px;
-                background-color: white;
-                color: #3879bd;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-weight: bold;
-            }
             .cabecalho-faixa-container {
                 display: flex;
                 background-color: #3879bd;
@@ -65,21 +46,19 @@ def renderizar_fornecedores():
         </style>
     """, unsafe_allow_html=True)
 
-    # Cabeçalho com título, botão e campo de busca dentro da faixa azul
-    st.markdown("""
-        <div class="top-bar">
-            <h1>🏢 Fornecedores</h1>
-            <div class="actions">
-                <form action="" method="post">
-                    <input name="busca" type="text" placeholder="Pesquisar...">
-                    <button type="submit">🔍</button>
-                </form>
-                <form action="" method="post">
-                    <button name="cadastrar" type="submit">➕ Cadastrar</button>
-                </form>
+    # Cabeçalho com título e botão funcional
+    col1, col2 = st.columns([6, 2])
+    with col1:
+        st.markdown("""
+            <div class="top-bar">
+                <h1>🏢 Fornecedores</h1>
             </div>
-        </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("<div style='margin-top: 1.5rem; text-align: right;'>", unsafe_allow_html=True)
+        if st.button("➕ Cadastrar", use_container_width=True):
+            st.switch_page("formulario_fornecedor.py")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # Carregar dados
     fornecedores = carregar_fornecedores()
