@@ -80,7 +80,6 @@ fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 st.markdown("""
     <div class='cabecalho-faixa-container'>
         <div class='cabecalho-faixa-item' style='flex: 3;'>Razão Social</div>
-        <div class='cabecalho-faixa-item' style='flex: 2;'>Fantasia</div>
         <div class='cabecalho-faixa-item' style='flex: 2.5;'>CNPJ</div>
         <div class='cabecalho-faixa-item' style='flex: 2.5;'>E-mail</div>
         <div class='cabecalho-faixa-item' style='flex: 2;'>Telefone</div>
