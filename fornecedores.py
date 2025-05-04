@@ -70,48 +70,25 @@ def renderizar_fornecedores():
     """, unsafe_allow_html=True)
 
     # Cabeçalho com título, botão e campo de busca dentro da faixa azul
-    st.markdown("""
-        <div class="top-bar">
-            <h1>🏢 Fornecedores</h1>
-            <div class="actions">
-                <form action="" method="post">
-                    <input name="busca" type="text" placeholder="Pesquisar...">
-                    <button type="submit">🔍</button>
-                </form>
-                <form action="" method="post">
-                    <button name="cadastrar" type="submit">➕ Cadastrar</button>
-                </form>
+    col1, col2 = st.columns([6, 2])
+    with col1:
+        st.markdown("""
+            <div class="top-bar">
+                <h1>🏢 Fornecedores</h1>
+                <div class="actions">
+                    <form action="" method="post">
+                        <input name="busca" type="text" placeholder="Pesquisar...">
+                        <button type="submit">🔍</button>
+                    </form>
+                    <form action="" method="post">
+                        <button name="cadastrar" type="submit">➕ Cadastrar</button>
+                    </form>
+                </div>
             </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    # Substituir manipulação de busca com widgets reais do Streamlit
-    busca = st.session_state.get("busca_valor", "")
-    cadastrar_clicked = False
-    if "form_submitted" not in st.session_state:
-        st.session_state.form_submitted = False
-
-    busca = st.text_input("", value=busca, label_visibility="collapsed", placeholder="Pesquisar...", key="busca_valor")
-    col_btn1, col_btn2 = st.columns([0.1, 1])
-    with col_btn1:
-        if st.button("🔍"):
-            st.session_state.form_submitted = True
-    with col_btn2:
-        if st.button("➕ Cadastrar"):
-            st.switch_page("formulario_fornecedor.py")
+        """, unsafe_allow_html=True)
 
     # Carregar dados
     fornecedores = carregar_fornecedores()
-
-    if st.session_state.form_submitted and busca:
-        busca = busca.lower()
-        fornecedores = fornecedores[
-            fornecedores["razao_social"].str.lower().str.contains(busca)
-            | fornecedores["nome_fantasia"].str.lower().str.contains(busca)
-            | fornecedores["cnpj"].str.contains(busca)
-        ]
-
-    fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
     # Paginação e setas abaixo
     por_pagina = 10
