@@ -11,7 +11,7 @@ def renderizar_fornecedores():
     st.markdown("""
         <style>
             .titulo-header {
-                font-size: 24px;
+                font-size: 30px;
                 font-weight: bold;
                 color: #3879bd;
                 margin-bottom: 0.5rem;
