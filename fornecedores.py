@@ -10,14 +10,39 @@ def renderizar_fornecedores():
     # Estilos adicionais
     st.markdown("""
         <style>
-            .titulo-header {
-                font-size: 40px;
-                font-weight: bold;
-                color: #3879bd;
-                margin-bottom: 0.5rem;
+            .top-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: #3879bd;
+                padding: 12px 20px;
+                border-radius: 8px;
+                margin-bottom: 1rem;
             }
-            .botao-cadastrar {
-                margin-top: 1.6rem;
+            .top-bar h1 {
+                margin: 0;
+                font-size: 24px;
+                color: white;
+                display: inline-block;
+            }
+            .top-bar .actions {
+                display: flex;
+                gap: 10px;
+            }
+            .top-bar .actions input[type="text"] {
+                padding: 6px 10px;
+                border-radius: 5px;
+                border: none;
+                width: 200px;
+            }
+            .top-bar .actions button {
+                padding: 6px 12px;
+                background-color: white;
+                color: #3879bd;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
             }
             .setas-pequenas button {
                 font-size: 12px !important;
@@ -44,39 +69,41 @@ def renderizar_fornecedores():
         </style>
     """, unsafe_allow_html=True)
 
-    # Cabeçalho com título e botão
-    col1, col2 = st.columns([4, 1.5])
-    with col1:
-        st.markdown("<div class='titulo-header'>🏢 Fornecedores</div>", unsafe_allow_html=True)
-    with col2:
-        st.markdown("<div class='botao-cadastrar'>", unsafe_allow_html=True)
+    # Cabeçalho com título, botão e campo de busca dentro da faixa azul
+    st.markdown("""
+        <div class="top-bar">
+            <h1>🏢 Fornecedores</h1>
+            <div class="actions">
+                <form action="" method="post">
+                    <input name="busca" type="text" placeholder="Pesquisar...">
+                    <button type="submit">🔍</button>
+                </form>
+                <form action="" method="post">
+                    <button name="cadastrar" type="submit">➕ Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Substituir manipulação de busca com widgets reais do Streamlit
+    busca = st.session_state.get("busca_valor", "")
+    cadastrar_clicked = False
+    if "form_submitted" not in st.session_state:
+        st.session_state.form_submitted = False
+
+    busca = st.text_input("", value=busca, label_visibility="collapsed", placeholder="Pesquisar...", key="busca_valor")
+    col_btn1, col_btn2 = st.columns([0.1, 1])
+    with col_btn1:
+        if st.button("🔍"):
+            st.session_state.form_submitted = True
+    with col_btn2:
         if st.button("➕ Cadastrar"):
             st.switch_page("formulario_fornecedor.py")
-        st.markdown("</div>", unsafe_allow_html=True)
 
     # Carregar dados
     fornecedores = carregar_fornecedores()
 
-    # Linha com campo de busca à esquerda e setas à direita
-    col_busca, col_vazio, col_seta_esq, col_seta_dir = st.columns([1.5, 6.5, 0.5, 0.5])
-
-    with col_busca:
-        with st.form(key="form_busca"):
-            col_search1, col_search2 = st.columns([5, 1])
-            busca = col_search1.text_input("", placeholder="Pesquisar...", label_visibility="collapsed")
-            buscar = col_search2.form_submit_button("🔍")
-
-    with col_seta_esq:
-        if st.button("◀") and st.session_state.get("pagina_fornecedores", 1) > 1:
-            st.session_state["pagina_fornecedores"] -= 1
-
-    with col_seta_dir:
-        total = len(fornecedores)
-        paginas = max(1, (total - 1) // 10 + 1)
-        if st.button("▶") and st.session_state.get("pagina_fornecedores", 1) < paginas:
-            st.session_state["pagina_fornecedores"] += 1
-
-    if busca:
+    if st.session_state.form_submitted and busca:
         busca = busca.lower()
         fornecedores = fornecedores[
             fornecedores["razao_social"].str.lower().str.contains(busca)
@@ -86,11 +113,20 @@ def renderizar_fornecedores():
 
     fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
-    # Paginação aplicada
+    # Paginação e setas abaixo
     por_pagina = 10
     total = len(fornecedores)
     paginas = max(1, (total - 1) // por_pagina + 1)
     pagina = st.session_state.get("pagina_fornecedores", 1)
+
+    col_seta_esq, col_seta_dir = st.columns([0.5, 0.5])
+    with col_seta_esq:
+        if st.button("◀") and pagina > 1:
+            pagina -= 1
+    with col_seta_dir:
+        if st.button("▶") and pagina < paginas:
+            pagina += 1
+
     st.session_state["pagina_fornecedores"] = pagina
 
     inicio = (pagina - 1) * por_pagina
