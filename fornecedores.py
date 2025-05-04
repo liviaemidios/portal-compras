@@ -44,10 +44,6 @@ def renderizar_fornecedores():
                 cursor: pointer;
                 font-weight: bold;
             }
-            .setas-pequenas button {
-                font-size: 12px !important;
-                padding: 0.25rem 0.5rem !important;
-            }
             .cabecalho-faixa-container {
                 display: flex;
                 background-color: #3879bd;
@@ -70,45 +66,24 @@ def renderizar_fornecedores():
     """, unsafe_allow_html=True)
 
     # Cabeçalho com título, botão e campo de busca dentro da faixa azul
-    col1, col2 = st.columns([6, 2])
-    with col1:
-        st.markdown("""
-            <div class="top-bar">
-                <h1>🏢 Fornecedores</h1>
-                <div class="actions">
-                    <form action="" method="post">
-                        <input name="busca" type="text" placeholder="Pesquisar...">
-                        <button type="submit">🔍</button>
-                    </form>
-                    <form action="" method="post">
-                        <button name="cadastrar" type="submit">➕ Cadastrar</button>
-                    </form>
-                </div>
+    st.markdown("""
+        <div class="top-bar">
+            <h1>🏢 Fornecedores</h1>
+            <div class="actions">
+                <form action="" method="post">
+                    <input name="busca" type="text" placeholder="Pesquisar...">
+                    <button type="submit">🔍</button>
+                </form>
+                <form action="" method="post">
+                    <button name="cadastrar" type="submit">➕ Cadastrar</button>
+                </form>
             </div>
-        """, unsafe_allow_html=True)
+        </div>
+    """, unsafe_allow_html=True)
 
     # Carregar dados
     fornecedores = carregar_fornecedores()
-
-    # Paginação e setas abaixo
-    por_pagina = 10
-    total = len(fornecedores)
-    paginas = max(1, (total - 1) // por_pagina + 1)
-    pagina = st.session_state.get("pagina_fornecedores", 1)
-
-    col_seta_esq, col_seta_dir = st.columns([0.5, 0.5])
-    with col_seta_esq:
-        if st.button("◀") and pagina > 1:
-            pagina -= 1
-    with col_seta_dir:
-        if st.button("▶") and pagina < paginas:
-            pagina += 1
-
-    st.session_state["pagina_fornecedores"] = pagina
-
-    inicio = (pagina - 1) * por_pagina
-    fim = inicio + por_pagina
-    fornecedores_pag = fornecedores.iloc[inicio:fim]
+    fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
     # Cabeçalho da tabela em faixa azul contínua
     st.markdown("""
@@ -123,7 +98,7 @@ def renderizar_fornecedores():
     """, unsafe_allow_html=True)
 
     # Linhas da tabela
-    for _, row in fornecedores_pag.iterrows():
+    for _, row in fornecedores.iterrows():
         col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2.5, 2.5, 2, 1])
         col1.write(row["razao_social"])
         col2.write(row["nome_fantasia"])
@@ -131,5 +106,3 @@ def renderizar_fornecedores():
         col4.write(row["email"])
         col5.write(row["telefone"])
         col6.markdown("<span style='font-size:16px;'>👁️ ✏️ 🗑️</span>", unsafe_allow_html=True)
-
-    st.markdown(f"<div style='text-align: right; font-size: 13px;'>Página {pagina} de {paginas}</div>", unsafe_allow_html=True)
