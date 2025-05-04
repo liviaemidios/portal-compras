@@ -60,14 +60,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Topo com título, busca e botão
+# Faixa superior
 st.markdown("""
     <div class="top-bar">
         <h1>🏭 Concorrentes</h1>
         <div class="actions">
             <input type="text" placeholder="Pesquisar...">
             <button>🔍</button>
-            <button>➕ Cadastrar</button>
+            <button onclick="window.location.href='formulario_concorrente.py'">➕ Cadastrar</button>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -79,8 +79,7 @@ concorrentes = concorrentes.sort_values("razao_social").reset_index(drop=True)
 # Cabeçalho da tabela
 st.markdown("""
     <div class='cabecalho-faixa-container'>
-        <div class='cabecalho-faixa-item' style='flex: 3;'>Razão Social</div>
-        <div class='cabecalho-faixa-item' style='flex: 2;'>Fantasia</div>
+        <div class='cabecalho-faixa-item' style='flex: 4;'>Razão Social</div>
         <div class='cabecalho-faixa-item' style='flex: 2.5;'>CNPJ</div>
         <div class='cabecalho-faixa-item' style='flex: 2.5;'>E-mail</div>
         <div class='cabecalho-faixa-item' style='flex: 2;'>Telefone</div>
@@ -99,21 +98,20 @@ fim = inicio + por_pagina
 concorrentes_pag = concorrentes.iloc[inicio:fim]
 
 for _, row in concorrentes_pag.iterrows():
-    col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 2.5, 2.5, 2, 1])
+    col1, col2, col3, col4, col5 = st.columns([4, 2.5, 2.5, 2, 1])
     col1.write(row["razao_social"])
-    col2.write(row["nome_fantasia"])
-    col3.write(row["cnpj"])
-    col4.write(row["email"])
-    col5.write(row["telefone"])
-    col6.markdown("<span style='font-size:16px;'>👁️ ✏️ 🗑️</span>", unsafe_allow_html=True)
+    col2.write(row["cnpj"])
+    col3.write(row["email"])
+    col4.write(row["telefone"])
+    col5.markdown("<span style='font-size:16px;'>👁️ ✏️ 🗑️</span>", unsafe_allow_html=True)
 
+# Navegação
 col_esq, col_meio, col_dir = st.columns([1, 10, 1])
 with col_esq:
-    if st.button("◀", key="ant_concorrente") and pagina > 1:
+    if st.button("◀", key="ant_conc") and pagina > 1:
         st.session_state["pagina_concorrentes"] = pagina - 1
 with col_meio:
     st.markdown(f"<div style='text-align: center;'>Página {pagina} de {paginas}</div>", unsafe_allow_html=True)
 with col_dir:
-    if st.button("▶", key="prox_concorrente") and pagina < paginas:
+    if st.button("▶", key="prox_conc") and pagina < paginas:
         st.session_state["pagina_concorrentes"] = pagina + 1
-
