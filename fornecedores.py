@@ -58,7 +58,7 @@ def renderizar_fornecedores():
     fornecedores = carregar_fornecedores()
 
     # Linha com campo de busca à esquerda e setas à direita
-    col_busca, col_vazio, col_seta_esq, col_seta_dir = st.columns([6, 2.5, 0.5, 0.5])
+    col_busca, col_vazio, col_seta_esq, col_seta_dir = st.columns([1.5, 6.5, 0.5, 0.5])
 
     with col_busca:
         with st.form(key="form_busca"):
