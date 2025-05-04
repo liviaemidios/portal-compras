@@ -1,2 +1,2 @@
-usuario,senha,nome
-maria,81dc9bdb52d04dc20036dbd8313ed055,Maria
+usuario,senha,nome,email,cpf,rg,data_nascimento,endereco,telefone_fixo,telefone_celular
+maria,81dc9bdb52d04dc20036dbd8313ed055,Maria,maria@email.com,00000000191,123456789,1990-01-01,Rua Exemplo,11223344,11999999999
