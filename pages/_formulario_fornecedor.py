@@ -1,4 +1,4 @@
-# _formulario_fornecedor.py (dentro da pasta pages/)
+# pages/_formulario_fornecedor.py
 import streamlit as st
 import pandas as pd
 from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
@@ -11,14 +11,13 @@ st.markdown("""
             background-color: #f5f5f5;
             padding: 2rem;
             border-radius: 10px;
+            margin-top: 2rem;
         }
         .titulo-formulario {
             font-size: 26px;
             color: #3879bd;
             font-weight: bold;
-        }
-        section[data-testid="stSidebar"] ul li a[href*="_formulario_fornecedor"] {
-            display: none;
+            margin-bottom: 1rem;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -26,6 +25,7 @@ st.markdown("""
 st.markdown("<div class='titulo-formulario'>➕ Cadastro de Fornecedor</div>", unsafe_allow_html=True)
 
 fornecedores = carregar_fornecedores()
+
 id_editar = st.query_params.get("editar")
 if id_editar is not None:
     id_editar = int(id_editar)
@@ -33,7 +33,7 @@ if id_editar is not None:
 else:
     dados = {col: "" for col in fornecedores.columns}
 
-with st.form(key="form_fornecedor"):
+with st.form("form_fornecedor"):
     st.subheader("Dados da Empresa")
     dados["razao_social"] = st.text_input("Razão Social", value=dados["razao_social"])
     dados["nome_fantasia"] = st.text_input("Nome Fantasia", value=dados["nome_fantasia"])
@@ -60,7 +60,7 @@ with st.form(key="form_fornecedor"):
 
     dados["observacoes"] = st.text_area("Observações Adicionais", value=dados["observacoes"])
 
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns(2)
     salvar = col1.form_submit_button("💾 Salvar")
     cancelar = col2.form_submit_button("❌ Cancelar")
 
