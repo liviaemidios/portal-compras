@@ -49,31 +49,41 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <div class="faixa-superior">
-        <h1>🏢 Fornecedores</h1>
-        <div class="botoes-faixa">
-            <div>
-                <button class="botao-principal" onclick="window.location.reload();">🔍</button>
+# Faixa superior com botão e campo de busca
+col1, col2 = st.columns([2, 6])
+with col1:
+    st.markdown("""
+        <div class="faixa-superior">
+            <h1>🏢 Fornecedores</h1>
+            <div class="botoes-faixa">
+                <form action="/formulario_fornecedor" method="get">
+                    <button class="botao-principal" type="submit">➕ Cadastrar Fornecedor</button>
+                </form>
             </div>
         </div>
-    </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# Botão funcional do Streamlit para cadastro
-if st.button("➕ Cadastrar Fornecedor"):
-    st.switch_page("formulario_fornecedor.py")
+with col2:
+    st.markdown("""
+        <div class="faixa-superior">
+            <div class="botoes-faixa">
+                <form method="get">
+                    <input class="campo-pesquisa" name="busca" placeholder="Pesquisar..." value="">
+                    <button class="botao-principal" type="submit">🔍</button>
+                </form>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
-# Campo de busca
-busca = st.query_params.get("busca", "").lower()
-
+# Carregando e filtrando dados
 fornecedores = carregar_fornecedores()
+busca = st.query_params.get("busca", "").lower()
 if busca:
     fornecedores = fornecedores[fornecedores.apply(lambda row: row.astype(str).str.lower().str.contains(busca).any(), axis=1)]
 
 fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
-# Tabela de cabeçalho
+# Cabeçalho da tabela
 st.markdown("""
     <div style='display:flex; background-color:#3879bd; color:white; font-weight:bold; padding:10px; border-radius:5px;'>
         <div style='flex: 4;'>Razão Social</div>
@@ -89,11 +99,11 @@ por_pagina = 10
 total = len(fornecedores)
 paginas = max(1, (total - 1) // por_pagina + 1)
 pagina = st.session_state.pagina_fornecedores
-
 inicio = (pagina - 1) * por_pagina
 fim = inicio + por_pagina
 fornecedores_pag = fornecedores.iloc[inicio:fim]
 
+# Lista de fornecedores
 for i, row in fornecedores_pag.iterrows():
     col1, col2, col3, col4, col5 = st.columns([4, 2.5, 2.5, 2, 1])
     col1.write(row["razao_social"])
@@ -126,7 +136,7 @@ for i, row in fornecedores_pag.iterrows():
             if col_canc.button("❌ Cancelar", key=f"cancel_del_f_{uid}"):
                 st.experimental_rerun()
 
-# Paginação - rodapé
+# Rodapé da paginação
 col_esq, col_meio, col_dir = st.columns([1, 10, 1])
 with col_esq:
     if st.button("◀", key="ant_f") and pagina > 1:
