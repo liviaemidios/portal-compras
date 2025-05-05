@@ -1,44 +1,34 @@
+# app.py
 import streamlit as st
 from setup import inicializar_sistema
-from login import login_page, get_current_user
-import concorrentes as mod_concorrentes
-import produtos as mod_produtos
-import fornecedores as mod_fornecedores
-
-inicializar_sistema()  # Garante que os arquivos CSV existam
+import login
 
 st.set_page_config(page_title="Portal Interno de Compras", layout="wide")
 
+# Inicializa arquivos necessários\inicializar_sistema()
+
+# Login
 if "usuario" not in st.session_state:
-    st.session_state.usuario = None
-
-if st.session_state.usuario is None:
-    login_page()
-    st.stop()
-
-usuario = get_current_user()
-
-# Menu lateral
-with st.sidebar:
-    st.markdown("""
-        <style>
-        .sidebar .sidebar-content {
-            padding-top: 1rem;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    st.markdown(f"### 👤 {usuario['nome']}")
-
-    menu = st.radio("", [
+    login.login_page()
+else:
+    pagina = st.sidebar.radio("Menu", [
+        "🏠 Dashboard",
         "🏢 Fornecedores",
-        "🚚 Concorrentes",
-        "📦 Produtos"
-    ], label_visibility="collapsed")
+        "🏭 Concorrentes",
+        "💲 Precificação",
+        "📦 Produtos",
+        "📈 Relatórios"
+    ])
 
-# Rotas do menu
-if menu == "🏢 Fornecedores":
-    mod_fornecedores.renderizar_fornecedores()
-elif menu == "🚚 Concorrentes":
-    mod_concorrentes.renderizar_concorrentes()
-elif menu == "📦 Produtos":
-    mod_produtos.renderizar_produtos()
+    if pagina == "🏠 Dashboard":
+        st.switch_page("pages/1_📊_Dashboard.py")
+    elif pagina == "🏢 Fornecedores":
+        st.switch_page("pages/2_📁_Fornecedores.py")
+    elif pagina == "🏭 Concorrentes":
+        st.switch_page("pages/3_🏭_Concorrentes.py")
+    elif pagina == "💲 Precificação":
+        st.switch_page("pages/4_💲_Precificação.py")
+    elif pagina == "📦 Produtos":
+        st.switch_page("pages/5_📦_Produtos.py")
+    elif pagina == "📈 Relatórios":
+        st.switch_page("pages/6_📈_Relatorios.py")
