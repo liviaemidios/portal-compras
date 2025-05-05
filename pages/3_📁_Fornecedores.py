@@ -1,3 +1,4 @@
+# pages/3_📁_Fornecedores.py
 import streamlit as st
 import pandas as pd
 import uuid
@@ -10,7 +11,6 @@ if "busca_fornecedor" not in st.session_state:
 if "pagina_fornecedores" not in st.session_state:
     st.session_state.pagina_fornecedores = 1
 
-# Estilo
 st.markdown("""
     <style>
         .faixa-superior {
@@ -49,27 +49,33 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Faixa superior com botão e busca
-col1, col2, col3 = st.columns([5, 2, 3])
-with col1:
-    st.markdown("<h1 style='color:white;'>🏢 Fornecedores</h1>", unsafe_allow_html=True)
-with col2:
-    if st.button("➕ Cadastrar Fornecedor", key="cadastrar_fornecedor"):
-        st.switch_page("pages/_formulario_fornecedor.py")
-with col3:
-    busca_input = st.text_input("", placeholder="🔍 Pesquisar...", key="campo_busca_fornecedor")
-    st.session_state.busca_fornecedor = busca_input
+st.markdown("""
+    <div class="faixa-superior">
+        <h1>🏢 Fornecedores</h1>
+        <div class="botoes-faixa">
+            <a href="?cadastrar=true">
+                <button class="botao-principal">➕ Cadastrar Fornecedor</button>
+            </a>
+            <form method="get">
+                <input class="campo-pesquisa" name="busca" placeholder="Pesquisar..." value="">
+                <button class="botao-principal" type="submit">🔍</button>
+            </form>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
-# Carregar dados
+# Redireciona para o cadastro se for requisitado
+if st.query_params.get("cadastrar") == "true":
+    st.switch_page("formulario_fornecedor.py")
+
+# Lista de fornecedores
 fornecedores = carregar_fornecedores()
-busca = st.session_state.busca_fornecedor.lower()
+busca = st.query_params.get("busca", "").lower()
 if busca:
     fornecedores = fornecedores[fornecedores.apply(lambda row: row.astype(str).str.lower().str.contains(busca).any(), axis=1)]
 
-# Ordenar
 fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
-# Cabeçalhos da tabela
 st.markdown("""
     <div style='display:flex; background-color:#3879bd; color:white; font-weight:bold; padding:10px; border-radius:5px;'>
         <div style='flex: 4;'>Razão Social</div>
@@ -80,7 +86,6 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Paginação
 por_pagina = 10
 total = len(fornecedores)
 paginas = max(1, (total - 1) // por_pagina + 1)
@@ -90,7 +95,6 @@ inicio = (pagina - 1) * por_pagina
 fim = inicio + por_pagina
 fornecedores_pag = fornecedores.iloc[inicio:fim]
 
-# Linhas da tabela
 for i, row in fornecedores_pag.iterrows():
     col1, col2, col3, col4, col5 = st.columns([4, 2.5, 2.5, 2, 1])
     col1.write(row["razao_social"])
@@ -110,7 +114,7 @@ for i, row in fornecedores_pag.iterrows():
 
     if editar:
         st.query_params["editar"] = str(i + inicio)
-        st.switch_page("pages/_formulario_fornecedor.py")
+        st.switch_page("formulario_fornecedor.py")
 
     if excluir:
         with st.expander(f"⚠️ Confirmar exclusão de {row['razao_social']}?", expanded=True):
@@ -123,7 +127,6 @@ for i, row in fornecedores_pag.iterrows():
             if col_canc.button("❌ Cancelar", key=f"cancel_del_f_{uid}"):
                 st.experimental_rerun()
 
-# Paginação
 col_esq, col_meio, col_dir = st.columns([1, 10, 1])
 with col_esq:
     if st.button("◀", key="ant_f") and pagina > 1:
