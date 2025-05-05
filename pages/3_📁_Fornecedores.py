@@ -53,24 +53,27 @@ st.markdown("""
     <div class="faixa-superior">
         <h1>🏢 Fornecedores</h1>
         <div class="botoes-faixa">
-            <form action="formulario_fornecedor" method="get">
-                <button class="botao-principal" type="submit">➕ Cadastrar Fornecedor</button>
-            </form>
-            <form method="get">
-                <input class="campo-pesquisa" name="busca" placeholder="Pesquisar..." value="">
-                <button class="botao-principal" type="submit">🔍</button>
-            </form>
+            <div>
+                <button class="botao-principal" onclick="window.location.reload();">🔍</button>
+            </div>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-fornecedores = carregar_fornecedores()
+# Botão funcional do Streamlit para cadastro
+if st.button("➕ Cadastrar Fornecedor"):
+    st.switch_page("formulario_fornecedor.py")
+
+# Campo de busca
 busca = st.query_params.get("busca", "").lower()
+
+fornecedores = carregar_fornecedores()
 if busca:
     fornecedores = fornecedores[fornecedores.apply(lambda row: row.astype(str).str.lower().str.contains(busca).any(), axis=1)]
 
 fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
+# Tabela de cabeçalho
 st.markdown("""
     <div style='display:flex; background-color:#3879bd; color:white; font-weight:bold; padding:10px; border-radius:5px;'>
         <div style='flex: 4;'>Razão Social</div>
@@ -81,6 +84,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
+# Paginação
 por_pagina = 10
 total = len(fornecedores)
 paginas = max(1, (total - 1) // por_pagina + 1)
@@ -122,6 +126,7 @@ for i, row in fornecedores_pag.iterrows():
             if col_canc.button("❌ Cancelar", key=f"cancel_del_f_{uid}"):
                 st.experimental_rerun()
 
+# Paginação - rodapé
 col_esq, col_meio, col_dir = st.columns([1, 10, 1])
 with col_esq:
     if st.button("◀", key="ant_f") and pagina > 1:
