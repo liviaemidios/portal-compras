@@ -1,93 +1,87 @@
 # formulario_fornecedor.py
 import streamlit as st
 import pandas as pd
-import os
-
-CAMINHO_FORNECEDORES = "database/fornecedores.csv"
-
-# Funções auxiliares
-def carregar_fornecedores():
-    if os.path.exists(CAMINHO_FORNECEDORES):
-        return pd.read_csv(CAMINHO_FORNECEDORES)
-    return pd.DataFrame(columns=[
-        "razao_social", "nome_fantasia", "cnpj", "inscricao_estadual", "inscricao_municipal",
-        "telefone_fixo", "celular", "email", "logradouro", "numero", "bairro", "cidade", "estado", "cep",
-        "pedido_minimo", "prazo_pagamento", "formas_pagamento", "frete",
-        "responsavel_nome", "responsavel_telefone", "responsavel_email", "observacoes"
-    ])
-
-def salvar_fornecedores(df):
-    df.to_csv(CAMINHO_FORNECEDORES, index=False)
+from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
 
 st.set_page_config(page_title="Cadastro de Fornecedor", layout="wide")
 
-# Recuperar parâmetros da URL
-params = st.query_params
-modo_edicao = "editar" in params
-indice_edicao = int(params.get("editar", ["-1"])[0]) if modo_edicao else -1
+st.markdown("""
+    <style>
+        .titulo-form {
+            background-color: #3879bd;
+            padding: 1rem;
+            border-radius: 8px;
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# Carrega dados se for edição
-df = carregar_fornecedores()
-if modo_edicao and 0 <= indice_edicao < len(df):
-    dados = df.loc[indice_edicao]
-    titulo = f"✏️ Editando fornecedor: {dados['razao_social']}"
-else:
-    dados = {}
-    titulo = "➕ Novo cadastro de fornecedor"
+st.markdown("<div class='titulo-form'>📋 Cadastrar Novo Fornecedor</div>", unsafe_allow_html=True)
 
-if st.button("🔙 Voltar"):
-    st.switch_page("pages/2_🏢_Fornecedores.py")
+with st.form("form_cadastro"):
+    col1, col2, col3 = st.columns(3)
+    razao_social = col1.text_input("Razão Social")
+    nome_fantasia = col2.text_input("Nome Fantasia")
+    cnpj = col3.text_input("CNPJ")
 
-st.markdown(f"## {titulo}")
+    col4, col5, col6 = st.columns(3)
+    telefone_fixo = col4.text_input("Telefone Fixo")
+    telefone_celular = col5.text_input("Celular")
+    email = col6.text_input("E-mail")
 
-# Formulário
-col1, col2 = st.columns(2)
-razao_social = col1.text_input("Razão Social", value=dados.get("razao_social", ""))
-nome_fantasia = col2.text_input("Nome Fantasia", value=dados.get("nome_fantasia", ""))
-cnpj = col1.text_input("CNPJ", value=dados.get("cnpj", ""))
-inscricao_estadual = col2.text_input("Inscrição Estadual", value=dados.get("inscricao_estadual", ""))
-inscricao_municipal = col1.text_input("Inscrição Municipal", value=dados.get("inscricao_municipal", ""))
+    endereco = st.text_input("Endereço Completo")
 
-telefone_fixo = col2.text_input("Telefone Fixo", value=dados.get("telefone_fixo", ""))
-celular = col1.text_input("Celular", value=dados.get("celular", ""))
-email = col2.text_input("E-mail", value=dados.get("email", ""))
+    col7, col8 = st.columns(2)
+    inscricao_estadual = col7.text_input("Inscrição Estadual")
+    inscricao_municipal = col8.text_input("Inscrição Municipal")
 
-logradouro = col1.text_input("Logradouro", value=dados.get("logradouro", ""))
-numero = col2.text_input("Número", value=dados.get("numero", ""))
-bairro = col1.text_input("Bairro", value=dados.get("bairro", ""))
-cidade = col2.text_input("Cidade", value=dados.get("cidade", ""))
-estado = col1.text_input("Estado", value=dados.get("estado", ""))
-cep = col2.text_input("CEP", value=dados.get("cep", ""))
+    col9, col10 = st.columns(2)
+    pedido_minimo = col9.text_input("Pedido Mínimo")
+    prazo_pagamento = col10.text_input("Prazo de Pagamento")
 
-pedido_minimo = col1.text_input("Pedido Mínimo", value=dados.get("pedido_minimo", ""))
-prazo_pagamento = col2.text_input("Prazo de Pagamento", value=dados.get("prazo_pagamento", ""))
-formas_pagamento = col1.text_input("Formas de Pagamento", value=dados.get("formas_pagamento", ""))
-frete = col2.text_input("Frete", value=dados.get("frete", ""))
+    forma_pagamento = st.text_input("Formas de Pagamento")
+    frete = st.text_input("Frete")
 
-responsavel_nome = col1.text_input("Responsável/Vendedor", value=dados.get("responsavel_nome", ""))
-responsavel_telefone = col2.text_input("Telefone do Responsável", value=dados.get("responsavel_telefone", ""))
-responsavel_email = col1.text_input("E-mail do Responsável", value=dados.get("responsavel_email", ""))
-observacoes = st.text_area("Observações", value=dados.get("observacoes", ""))
+    st.markdown("**Contato do Responsável/Vendedor**")
+    col11, col12, col13 = st.columns(3)
+    nome_contato = col11.text_input("Nome")
+    tel_contato = col12.text_input("Telefone")
+    email_contato = col13.text_input("E-mail")
 
-if st.button("💾 Salvar"):
-    novo = pd.DataFrame([{ 
-        "razao_social": razao_social, "nome_fantasia": nome_fantasia, "cnpj": cnpj,
-        "inscricao_estadual": inscricao_estadual, "inscricao_municipal": inscricao_municipal,
-        "telefone_fixo": telefone_fixo, "celular": celular, "email": email,
-        "logradouro": logradouro, "numero": numero, "bairro": bairro,
-        "cidade": cidade, "estado": estado, "cep": cep,
-        "pedido_minimo": pedido_minimo, "prazo_pagamento": prazo_pagamento,
-        "formas_pagamento": formas_pagamento, "frete": frete,
-        "responsavel_nome": responsavel_nome, "responsavel_telefone": responsavel_telefone,
-        "responsavel_email": responsavel_email, "observacoes": observacoes
-    }])
+    observacoes = st.text_area("Observações Adicionais")
 
-    if modo_edicao:
-        df.iloc[indice_edicao] = novo.iloc[0]
-    else:
+    col_salvar, col_cancelar = st.columns([1, 1])
+    salvar = col_salvar.form_submit_button("Salvar")
+    cancelar = col_cancelar.form_submit_button("Cancelar")
+
+    if salvar:
+        novo = pd.DataFrame([{
+            "razao_social": razao_social,
+            "nome_fantasia": nome_fantasia,
+            "cnpj": cnpj,
+            "telefone_fixo": telefone_fixo,
+            "telefone_celular": telefone_celular,
+            "email": email,
+            "endereco": endereco,
+            "inscricao_estadual": inscricao_estadual,
+            "inscricao_municipal": inscricao_municipal,
+            "pedido_minimo": pedido_minimo,
+            "prazo_pagamento": prazo_pagamento,
+            "forma_pagamento": forma_pagamento,
+            "frete": frete,
+            "nome_contato": nome_contato,
+            "tel_contato": tel_contato,
+            "email_contato": email_contato,
+            "observacoes": observacoes
+        }])
+        df = carregar_fornecedores()
         df = pd.concat([df, novo], ignore_index=True)
+        salvar_fornecedores(df)
+        st.success("Fornecedor cadastrado com sucesso!")
+        st.switch_page("pages/2_🏢_Fornecedores.py")
 
-    salvar_fornecedores(df)
-    st.success("Fornecedor salvo com sucesso!")
-    st.switch_page("pages/2_🏢_Fornecedores.py")
-
+    elif cancelar:
+        st.switch_page("pages/2_🏢_Fornecedores.py")
