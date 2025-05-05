@@ -9,6 +9,8 @@ st.set_page_config(page_title="Fornecedores", layout="wide")
 # Estado de pesquisa
 if "busca_fornecedor" not in st.session_state:
     st.session_state.busca_fornecedor = ""
+if "mostrar_formulario" not in st.session_state:
+    st.session_state.mostrar_formulario = False
 
 # Bloco visual da faixa azul no topo
 st.markdown("""
@@ -45,7 +47,8 @@ with st.container():
     col1, col2, col3 = st.columns([1.5, 2.5, 1])
     with col1:
         if st.button("➕ Cadastrar Fornecedor"):
-            st.switch_page("formulario_fornecedor.py")
+            st.session_state.mostrar_formulario = not st.session_state.mostrar_formulario
+
     with col2:
         with st.form("form_pesquisa", clear_on_submit=False):
             busca = st.text_input("", value=st.session_state.busca_fornecedor, label_visibility="collapsed", placeholder="Pesquisar fornecedor...")
@@ -54,6 +57,75 @@ with st.container():
                 pesquisar = st.form_submit_button("🔍")
             if pesquisar:
                 st.session_state.busca_fornecedor = busca
+
+# Formulário de cadastro tipo modal
+if st.session_state.mostrar_formulario:
+    with st.expander("📋 Cadastrar Novo Fornecedor", expanded=True):
+        with st.form("form_cadastro_fornecedor"):
+            col1, col2, col3 = st.columns(3)
+            razao_social = col1.text_input("Razão Social")
+            nome_fantasia = col2.text_input("Nome Fantasia")
+            cnpj = col3.text_input("CNPJ")
+
+            col4, col5, col6 = st.columns(3)
+            telefone_fixo = col4.text_input("Telefone Fixo")
+            telefone_celular = col5.text_input("Celular")
+            email = col6.text_input("E-mail")
+
+            endereco = st.text_input("Endereço Completo")
+
+            col7, col8 = st.columns(2)
+            inscricao_estadual = col7.text_input("Inscrição Estadual")
+            inscricao_municipal = col8.text_input("Inscrição Municipal")
+
+            col9, col10 = st.columns(2)
+            pedido_minimo = col9.text_input("Pedido Mínimo")
+            prazo_pagamento = col10.text_input("Prazo de Pagamento")
+
+            forma_pagamento = st.text_input("Formas de Pagamento")
+            frete = st.text_input("Frete")
+
+            st.markdown("**Contato do Responsável/Vendedor**")
+            col11, col12, col13 = st.columns(3)
+            nome_contato = col11.text_input("Nome")
+            tel_contato = col12.text_input("Telefone")
+            email_contato = col13.text_input("E-mail")
+
+            observacoes = st.text_area("Observações Adicionais")
+
+            col_salvar, col_cancelar = st.columns([1, 1])
+            salvar = col_salvar.form_submit_button("Salvar")
+            cancelar = col_cancelar.form_submit_button("Cancelar")
+
+            if salvar:
+                novo = pd.DataFrame([{
+                    "razao_social": razao_social,
+                    "nome_fantasia": nome_fantasia,
+                    "cnpj": cnpj,
+                    "telefone_fixo": telefone_fixo,
+                    "telefone_celular": telefone_celular,
+                    "email": email,
+                    "endereco": endereco,
+                    "inscricao_estadual": inscricao_estadual,
+                    "inscricao_municipal": inscricao_municipal,
+                    "pedido_minimo": pedido_minimo,
+                    "prazo_pagamento": prazo_pagamento,
+                    "forma_pagamento": forma_pagamento,
+                    "frete": frete,
+                    "nome_contato": nome_contato,
+                    "tel_contato": tel_contato,
+                    "email_contato": email_contato,
+                    "observacoes": observacoes
+                }])
+                df = carregar_fornecedores()
+                df = pd.concat([df, novo], ignore_index=True)
+                salvar_fornecedores(df)
+                st.success("Fornecedor cadastrado com sucesso!")
+                st.session_state.mostrar_formulario = False
+                st.experimental_rerun()
+            elif cancelar:
+                st.session_state.mostrar_formulario = False
+                st.experimental_rerun()
 
 # Dados
 fornecedores = carregar_fornecedores()
@@ -103,7 +175,8 @@ for i, row in fornecedores_pag.iterrows():
 
     if editar:
         st.query_params["editar"] = str(i + inicio)
-        st.switch_page("formulario_fornecedor.py")
+        st.session_state.mostrar_formulario = True
+        st.experimental_rerun()
 
     if excluir:
         with st.expander(f"⚠️ Confirmar exclusão de {row['razao_social']}?", expanded=True):
