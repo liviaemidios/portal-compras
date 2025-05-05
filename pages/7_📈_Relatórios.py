@@ -1,36 +1,31 @@
+# pages/7_📈_Relatórios.py
 import streamlit as st
 
 st.set_page_config(page_title="Relatórios", layout="wide")
 
 st.markdown("""
     <style>
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .faixa-superior {
             background-color: #3879bd;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 1rem;
+            border-radius: 0.5rem;
             margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .top-bar h1 {
-            margin: 0;
-            font-size: 24px;
+        .faixa-superior h1 {
             color: white;
-        }
-        .conteudo {
-            font-size: 16px;
-            color: #333;
+            font-size: 26px;
+            margin: 0;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Título com faixa azul
 st.markdown("""
-    <div class="top-bar">
+    <div class="faixa-superior">
         <h1>📈 Relatórios</h1>
     </div>
 """, unsafe_allow_html=True)
 
-# Conteúdo inicial
-st.markdown("<div class='conteudo'>Em breve você poderá gerar relatórios de compras, fornecedores, concorrentes e precificação aqui.</div>", unsafe_allow_html=True)
+st.info("Em breve: área de relatórios com visualização e exportação de dados.")
