@@ -53,9 +53,9 @@ st.markdown("""
     <div class="faixa-superior">
         <h1>🏢 Fornecedores</h1>
         <div class="botoes-faixa">
-            <a href="?cadastrar=true">
-                <button class="botao-principal">➕ Cadastrar Fornecedor</button>
-            </a>
+            <form action="_formulario_fornecedor" method="get">
+                <button class="botao-principal" type="submit">➕ Cadastrar Fornecedor</button>
+            </form>
             <form method="get">
                 <input class="campo-pesquisa" name="busca" placeholder="Pesquisar..." value="">
                 <button class="botao-principal" type="submit">🔍</button>
@@ -64,11 +64,6 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Redireciona para o cadastro se for requisitado
-if st.query_params.get("cadastrar") == "true":
-    st.switch_page("_formulario_fornecedor.py")
-
-# Lista de fornecedores
 fornecedores = carregar_fornecedores()
 busca = st.query_params.get("busca", "").lower()
 if busca:
@@ -114,7 +109,7 @@ for i, row in fornecedores_pag.iterrows():
 
     if editar:
         st.query_params["editar"] = str(i + inicio)
-        st.switch_page("formulario_fornecedor.py")
+        st.switch_page("_formulario_fornecedor")
 
     if excluir:
         with st.expander(f"⚠️ Confirmar exclusão de {row['razao_social']}?", expanded=True):
@@ -123,9 +118,9 @@ for i, row in fornecedores_pag.iterrows():
                 fornecedores.drop(index=i + inicio, inplace=True)
                 salvar_fornecedores(fornecedores)
                 st.success("Fornecedor excluído com sucesso.")
-                st.experimental_rerun()
+                st.rerun()
             if col_canc.button("❌ Cancelar", key=f"cancel_del_f_{uid}"):
-                st.experimental_rerun()
+                st.rerun()
 
 col_esq, col_meio, col_dir = st.columns([1, 10, 1])
 with col_esq:
