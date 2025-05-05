@@ -10,71 +10,50 @@ st.set_page_config(page_title="Fornecedores", layout="wide")
 if "busca_fornecedor" not in st.session_state:
     st.session_state.busca_fornecedor = ""
 
+# Bloco visual da faixa azul no topo
 st.markdown("""
     <style>
-        .faixa-azul-container {
+        .faixa-azul {
             background-color: #3879bd;
-            padding: 12px 20px;
+            padding: 16px;
             border-radius: 8px;
             margin-bottom: 1rem;
         }
-        .faixa-azul-conteudo {
+        .linha-faixa {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
         }
-        .faixa-azul-conteudo h1 {
+        .linha-faixa h1 {
+            color: white;
             margin: 0;
             font-size: 24px;
-            color: white;
-        }
-        .faixa-azul-acoes {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .faixa-azul-acoes input[type="text"] {
-            padding: 6px 10px;
-            border-radius: 5px;
-            border: none;
-            width: 200px;
-        }
-        .faixa-azul-acoes button {
-            padding: 6px 12px;
-            background-color: white;
-            color: #3879bd;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
         }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <div class="faixa-azul-container">
-        <div class="faixa-azul-conteudo">
-            <h1>🏢 Fornecedores</h1>
-            <div class="faixa-azul-acoes">
-                <form action="" method="post">
-                    <button type="submit" name="cadastrar">➕ Cadastrar</button>
-                </form>
-                <form action="" method="post">
-                    <input type="text" name="busca" placeholder="Pesquisar fornecedor..." value="{0}"/>
-                    <button type="submit">🔍</button>
-                </form>
+with st.container():
+    st.markdown("""
+        <div class="faixa-azul">
+            <div class="linha-faixa">
+                <h1>🏢 Fornecedores</h1>
             </div>
         </div>
-    </div>
-""".format(st.session_state.busca_fornecedor), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# Lógica funcional dos botões
-if "cadastrar" in st.query_params:
-    st.switch_page("formulario_fornecedor.py")
-
-if "busca" in st.query_params:
-    st.session_state.busca_fornecedor = st.query_params["busca"]
+    col1, col2, col3 = st.columns([1.5, 2.5, 1])
+    with col1:
+        if st.button("➕ Cadastrar Fornecedor"):
+            st.switch_page("formulario_fornecedor.py")
+    with col2:
+        with st.form("form_pesquisa", clear_on_submit=False):
+            busca = st.text_input("", value=st.session_state.busca_fornecedor, label_visibility="collapsed", placeholder="Pesquisar fornecedor...")
+            col_pesq1, col_pesq2 = st.columns([4, 1])
+            with col_pesq2:
+                pesquisar = st.form_submit_button("🔍")
+            if pesquisar:
+                st.session_state.busca_fornecedor = busca
 
 # Dados
 fornecedores = carregar_fornecedores()
