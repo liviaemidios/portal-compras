@@ -12,35 +12,35 @@ if "busca_fornecedor" not in st.session_state:
 
 st.markdown("""
     <style>
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .faixa-azul-container {
             background-color: #3879bd;
             padding: 12px 20px;
             border-radius: 8px;
             margin-bottom: 1rem;
         }
-        .top-bar h1 {
+        .faixa-azul-conteudo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .faixa-azul-conteudo h1 {
             margin: 0;
             font-size: 24px;
             color: white;
         }
-        .actions {
+        .faixa-azul-acoes {
             display: flex;
+            align-items: center;
             gap: 10px;
         }
-        .actions form {
-            display: flex;
-            gap: 6px;
-        }
-        .actions input[type="text"] {
+        .faixa-azul-acoes input[type="text"] {
             padding: 6px 10px;
             border-radius: 5px;
             border: none;
-            width: 180px;
+            width: 200px;
         }
-        .actions button {
+        .faixa-azul-acoes button {
             padding: 6px 12px;
             background-color: white;
             color: #3879bd;
@@ -49,39 +49,32 @@ st.markdown("""
             cursor: pointer;
             font-weight: bold;
         }
-        .cabecalho-faixa-container {
-            display: flex;
-            background-color: #3879bd;
-            border-radius: 5px;
-            margin-top: 1rem;
-        }
-        .cabecalho-faixa-item {
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            padding: 10px 8px;
-            text-align: center;
-            border-right: 1px solid #ffffff33;
-            flex-shrink: 0;
-        }
-        .cabecalho-faixa-item:last-child {
-            border-right: none;
-        }
     </style>
 """, unsafe_allow_html=True)
 
-col_top1, col_top2, col_top3 = st.columns([4, 1.5, 2])
-with col_top1:
-    st.markdown("<h1 style='color: white; margin: 0;'>🏢 Fornecedores</h1>", unsafe_allow_html=True)
-with col_top2:
-    if st.button("➕ Cadastrar Fornecedor"):
-        st.switch_page("formulario_fornecedor.py")
-with col_top3:
-    with st.form("form_busca"):
-        busca = st.text_input("", value=st.session_state.busca_fornecedor, label_visibility="collapsed", placeholder="Pesquisar fornecedor...")
-        submitted = st.form_submit_button("🔍")
-        if submitted:
-            st.session_state.busca_fornecedor = busca
+st.markdown("""
+    <div class="faixa-azul-container">
+        <div class="faixa-azul-conteudo">
+            <h1>🏢 Fornecedores</h1>
+            <div class="faixa-azul-acoes">
+                <form action="" method="post">
+                    <button type="submit" name="cadastrar">➕ Cadastrar</button>
+                </form>
+                <form action="" method="post">
+                    <input type="text" name="busca" placeholder="Pesquisar fornecedor..." value="{0}"/>
+                    <button type="submit">🔍</button>
+                </form>
+            </div>
+        </div>
+    </div>
+""".format(st.session_state.busca_fornecedor), unsafe_allow_html=True)
+
+# Lógica funcional dos botões
+if "cadastrar" in st.query_params:
+    st.switch_page("formulario_fornecedor.py")
+
+if "busca" in st.query_params:
+    st.session_state.busca_fornecedor = st.query_params["busca"]
 
 # Dados
 fornecedores = carregar_fornecedores()
@@ -91,18 +84,18 @@ if st.session_state.busca_fornecedor:
 
 fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
-# Cabeçalho
+# Cabeçalho da lista
 st.markdown("""
-    <div class='cabecalho-faixa-container'>
-        <div class='cabecalho-faixa-item' style='flex: 4;'>Razão Social</div>
-        <div class='cabecalho-faixa-item' style='flex: 2.5;'>CNPJ</div>
-        <div class='cabecalho-faixa-item' style='flex: 2.5;'>E-mail</div>
-        <div class='cabecalho-faixa-item' style='flex: 2;'>Telefone</div>
-        <div class='cabecalho-faixa-item' style='flex: 1;'>Ações</div>
+    <div class='cabecalho-faixa-container' style='display:flex; background-color:#3879bd; border-radius:5px; margin-top:1rem;'>
+        <div class='cabecalho-faixa-item' style='flex: 4; color:white; font-weight:bold; padding:10px;'>Razão Social</div>
+        <div class='cabecalho-faixa-item' style='flex: 2.5; color:white; font-weight:bold; padding:10px;'>CNPJ</div>
+        <div class='cabecalho-faixa-item' style='flex: 2.5; color:white; font-weight:bold; padding:10px;'>E-mail</div>
+        <div class='cabecalho-faixa-item' style='flex: 2; color:white; font-weight:bold; padding:10px;'>Telefone</div>
+        <div class='cabecalho-faixa-item' style='flex: 1; color:white; font-weight:bold; padding:10px;'>Ações</div>
     </div>
 """, unsafe_allow_html=True)
 
-# Paginação
+# Paginacao
 por_pagina = 10
 total = len(fornecedores)
 paginas = max(1, (total - 1) // por_pagina + 1)
