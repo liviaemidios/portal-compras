@@ -6,13 +6,11 @@ from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
 
 st.set_page_config(page_title="Fornecedores", layout="wide")
 
-# Estados iniciais
 if "busca_fornecedor" not in st.session_state:
     st.session_state.busca_fornecedor = ""
 if "pagina_fornecedores" not in st.session_state:
     st.session_state.pagina_fornecedores = 1
 
-# Estilo da faixa azul
 st.markdown("""
     <style>
         .faixa-superior {
@@ -27,33 +25,47 @@ st.markdown("""
         }
         .faixa-superior h1 {
             color: white;
-            font-size: 24px;
+            font-size: 26px;
             margin: 0;
         }
         .botoes-faixa {
             display: flex;
             gap: 0.5rem;
+            align-items: center;
+        }
+        .botao-principal {
+            background-color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .campo-pesquisa {
+            padding: 0.4rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Cabeçalho com título, botão e campo de busca
+# Bloco superior com título, botão e campo de pesquisa
 st.markdown("""
     <div class="faixa-superior">
         <h1>🏢 Fornecedores</h1>
         <div class="botoes-faixa">
             <form action="formulario_fornecedor" method="get">
-                <button type="submit">➕ Cadastrar Fornecedor</button>
+                <button class="botao-principal" type="submit">➕ Cadastrar Fornecedor</button>
             </form>
             <form method="get">
-                <input name="busca" placeholder="Pesquisar..." value="" style="padding:0.3rem; border-radius:5px;">
-                <button type="submit">🔍</button>
+                <input class="campo-pesquisa" name="busca" placeholder="Pesquisar..." value="">
+                <button class="botao-principal" type="submit">🔍</button>
             </form>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# Carregando e filtrando dados
+# Carregamento e filtro
 fornecedores = carregar_fornecedores()
 busca = st.query_params.get("busca", "").lower()
 if busca:
@@ -61,7 +73,7 @@ if busca:
 
 fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
-# Cabeçalho da tabela
+# Cabeçalho da lista
 st.markdown("""
     <div style='display:flex; background-color:#3879bd; color:white; font-weight:bold; padding:10px; border-radius:5px;'>
         <div style='flex: 4;'>Razão Social</div>
@@ -114,7 +126,7 @@ for i, row in fornecedores_pag.iterrows():
             if col_canc.button("❌ Cancelar", key=f"cancel_del_f_{uid}"):
                 st.experimental_rerun()
 
-# Navegação de páginas
+# Paginação inferior
 col_esq, col_meio, col_dir = st.columns([1, 10, 1])
 with col_esq:
     if st.button("◀", key="ant_f") and pagina > 1:
