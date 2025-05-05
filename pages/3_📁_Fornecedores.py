@@ -66,7 +66,7 @@ st.markdown("""
 
 # Redireciona para o cadastro se for requisitado
 if st.query_params.get("cadastrar") == "true":
-    st.switch_page("formulario_fornecedor.py")
+    st.switch_page("_formulario_fornecedor.py")
 
 # Lista de fornecedores
 fornecedores = carregar_fornecedores()
