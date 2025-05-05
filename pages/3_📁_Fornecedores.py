@@ -1,4 +1,4 @@
-# pages/2_🏢_Fornecedores.py
+# pages/3_📁_Fornecedores.py
 import streamlit as st
 import pandas as pd
 import uuid
@@ -49,7 +49,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Bloco superior com título, botão e campo de pesquisa
 st.markdown("""
     <div class="faixa-superior">
         <h1>🏢 Fornecedores</h1>
@@ -65,7 +64,6 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Carregamento e filtro
 fornecedores = carregar_fornecedores()
 busca = st.query_params.get("busca", "").lower()
 if busca:
@@ -73,7 +71,6 @@ if busca:
 
 fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
-# Cabeçalho da lista
 st.markdown("""
     <div style='display:flex; background-color:#3879bd; color:white; font-weight:bold; padding:10px; border-radius:5px;'>
         <div style='flex: 4;'>Razão Social</div>
@@ -84,7 +81,6 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Paginação
 por_pagina = 10
 total = len(fornecedores)
 paginas = max(1, (total - 1) // por_pagina + 1)
@@ -99,7 +95,7 @@ for i, row in fornecedores_pag.iterrows():
     col1.write(row["razao_social"])
     col2.write(row["cnpj"])
     col3.write(row["email"])
-    col4.write(row["telefone_fixo"])
+    col4.write(row["telefone"])
 
     uid = str(uuid.uuid4()).replace("-", "")
     visualizar = col5.button("👁️", key=f"ver_f_{uid}")
@@ -126,7 +122,6 @@ for i, row in fornecedores_pag.iterrows():
             if col_canc.button("❌ Cancelar", key=f"cancel_del_f_{uid}"):
                 st.experimental_rerun()
 
-# Paginação inferior
 col_esq, col_meio, col_dir = st.columns([1, 10, 1])
 with col_esq:
     if st.button("◀", key="ant_f") and pagina > 1:
