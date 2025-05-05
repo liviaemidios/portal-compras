@@ -1,7 +1,7 @@
 import streamlit as st
 from setup import inicializar_sistema
 from login import login_page, get_current_user
-import distribuidoras as mod_distribuidoras
+import concorrentes as mod_concorrentes
 import produtos as mod_produtos
 import fornecedores as mod_fornecedores
 
@@ -31,14 +31,14 @@ with st.sidebar:
 
     menu = st.radio("", [
         "🏢 Fornecedores",
-        "🚚 Distribuidoras",
+        "🚚 Concorrentes",
         "📦 Produtos"
     ], label_visibility="collapsed")
 
 # Rotas do menu
 if menu == "🏢 Fornecedores":
     mod_fornecedores.renderizar_fornecedores()
-elif menu == "🚚 Distribuidoras":
-    mod_distribuidoras.renderizar_distribuidoras()
+elif menu == "🚚 Concorrentes":
+    mod_concorrentes.renderizar_concorrentes()
 elif menu == "📦 Produtos":
     mod_produtos.renderizar_produtos()
