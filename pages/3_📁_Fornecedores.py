@@ -11,6 +11,7 @@ if "busca_fornecedor" not in st.session_state:
 if "pagina_fornecedores" not in st.session_state:
     st.session_state.pagina_fornecedores = 1
 
+# Título e barra superior
 st.markdown("""
     <style>
         .faixa-superior {
@@ -45,39 +46,26 @@ st.markdown("""
             padding: 0.4rem;
             border-radius: 5px;
             border: 1px solid #ccc;
+            width: 200px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Faixa superior com botão e campo de busca
-col1, col2 = st.columns([2, 6])
-with col1:
-    st.markdown("""
-        <div class="faixa-superior">
-            <h1>🏢 Fornecedores</h1>
-            <div class="botoes-faixa">
-                <form action="/formulario_fornecedor" method="get">
-                    <button class="botao-principal" type="submit">➕ Cadastrar Fornecedor</button>
-                </form>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+col_titulo, col_botao, col_pesquisa, col_lupa = st.columns([3, 2, 3, 1])
+with col_titulo:
+    st.markdown("<div class='faixa-superior'><h1>🏢 Fornecedores</h1></div>", unsafe_allow_html=True)
+with col_botao:
+    if st.button("➕ Cadastrar Fornecedor"):
+        st.switch_page("formulario_fornecedor.py")
+with col_pesquisa:
+    st.session_state.busca_fornecedor = st.text_input("", placeholder="Pesquisar...")
+with col_lupa:
+    if st.button("🔍"):
+        st.experimental_rerun()
 
-with col2:
-    st.markdown("""
-        <div class="faixa-superior">
-            <div class="botoes-faixa">
-                <form method="get">
-                    <input class="campo-pesquisa" name="busca" placeholder="Pesquisar..." value="">
-                    <button class="botao-principal" type="submit">🔍</button>
-                </form>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-# Carregando e filtrando dados
+# Dados e filtro
 fornecedores = carregar_fornecedores()
-busca = st.query_params.get("busca", "").lower()
+busca = st.session_state.busca_fornecedor.lower()
 if busca:
     fornecedores = fornecedores[fornecedores.apply(lambda row: row.astype(str).str.lower().str.contains(busca).any(), axis=1)]
 
@@ -103,7 +91,7 @@ inicio = (pagina - 1) * por_pagina
 fim = inicio + por_pagina
 fornecedores_pag = fornecedores.iloc[inicio:fim]
 
-# Lista de fornecedores
+# Listagem
 for i, row in fornecedores_pag.iterrows():
     col1, col2, col3, col4, col5 = st.columns([4, 2.5, 2.5, 2, 1])
     col1.write(row["razao_social"])
@@ -123,7 +111,7 @@ for i, row in fornecedores_pag.iterrows():
 
     if editar:
         st.query_params["editar"] = str(i + inicio)
-        st.switch_page("formulario_fornecedor")
+        st.switch_page("formulario_fornecedor.py")
 
     if excluir:
         with st.expander(f"⚠️ Confirmar exclusão de {row['razao_social']}?", expanded=True):
