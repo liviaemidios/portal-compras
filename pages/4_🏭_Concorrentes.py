@@ -1,4 +1,4 @@
-# pages/3_🏭_Concorrentes.py
+# pages/4_🏭_Concorrentes.py
 import streamlit as st
 import pandas as pd
 import uuid
