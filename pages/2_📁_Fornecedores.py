@@ -1,3 +1,4 @@
+# pages/2_🏢_Fornecedores.py
 import streamlit as st
 import pandas as pd
 from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
@@ -65,9 +66,9 @@ st.markdown("""
     <div class="top-bar">
         <h1>🏢 Fornecedores</h1>
         <div class="actions">
+            <button onclick="window.location.href='formulario_fornecedor.py'">➕ Cadastrar</button>
             <input type="text" placeholder="Pesquisar...">
             <button>🔍</button>
-            <button onclick="window.location.href='formulario_fornecedor.py'">➕ Cadastrar</button>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -102,7 +103,7 @@ for i, row in fornecedores_pag.iterrows():
     col1.write(row["razao_social"])
     col2.write(row["cnpj"])
     col3.write(row["email"])
-    col4.write(row["telefone"])
+    col4.write(row["telefone_fixo"])
 
     uid = str(uuid.uuid4()).replace("-", "")
     visualizar = col5.button("👁️", key=f"ver_f_{uid}")
@@ -115,21 +116,8 @@ for i, row in fornecedores_pag.iterrows():
                 st.markdown(f"**{col.replace('_', ' ').title()}:** {row[col]}")
 
     if editar:
-        with st.expander(f"✏️ Editar - {row['razao_social']}", expanded=True):
-            atualizados = {}
-            for campo in fornecedores.columns:
-                atualizados[campo] = st.text_input(
-                    campo.replace("_", " ").title(), value=row[campo], key=f"{campo}_edit_{uid}"
-                )
-            col_s, col_c = st.columns(2)
-            if col_s.button("💾 Salvar", key=f"save_f_{uid}"):
-                for campo in fornecedores.columns:
-                    fornecedores.at[i + inicio, campo] = atualizados[campo]
-                salvar_fornecedores(fornecedores)
-                st.success("Alterações salvas.")
-                st.experimental_rerun()
-            if col_c.button("❌ Cancelar", key=f"cancel_edit_f_{uid}"):
-                st.experimental_rerun()
+        st.query_params["editar"] = str(i + inicio)
+        st.switch_page("formulario_fornecedor.py")
 
     if excluir:
         with st.expander(f"⚠️ Confirmar exclusão de {row['razao_social']}?", expanded=True):
