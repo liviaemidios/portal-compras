@@ -6,6 +6,10 @@ import uuid
 
 st.set_page_config(page_title="Fornecedores", layout="wide")
 
+# Estado de pesquisa
+if "busca_fornecedor" not in st.session_state:
+    st.session_state.busca_fornecedor = ""
+
 st.markdown("""
     <style>
         .top-bar {
@@ -25,6 +29,10 @@ st.markdown("""
         .actions {
             display: flex;
             gap: 10px;
+        }
+        .actions form {
+            display: flex;
+            gap: 6px;
         }
         .actions input[type="text"] {
             padding: 6px 10px;
@@ -62,19 +70,25 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <div class="top-bar">
-        <h1>🏢 Fornecedores</h1>
-        <div class="actions">
-            <button onclick="window.location.href='formulario_fornecedor.py'">➕ Cadastrar</button>
-            <input type="text" placeholder="Pesquisar...">
-            <button>🔍</button>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
+col_top1, col_top2, col_top3 = st.columns([4, 1.5, 2])
+with col_top1:
+    st.markdown("<h1 style='color: white; margin: 0;'>🏢 Fornecedores</h1>", unsafe_allow_html=True)
+with col_top2:
+    if st.button("➕ Cadastrar Fornecedor"):
+        st.switch_page("formulario_fornecedor.py")
+with col_top3:
+    with st.form("form_busca"):
+        busca = st.text_input("", value=st.session_state.busca_fornecedor, label_visibility="collapsed", placeholder="Pesquisar fornecedor...")
+        submitted = st.form_submit_button("🔍")
+        if submitted:
+            st.session_state.busca_fornecedor = busca
 
 # Dados
 fornecedores = carregar_fornecedores()
+if st.session_state.busca_fornecedor:
+    busca_lower = st.session_state.busca_fornecedor.lower()
+    fornecedores = fornecedores[fornecedores.apply(lambda row: row.astype(str).str.lower().str.contains(busca_lower).any(), axis=1)]
+
 fornecedores = fornecedores.sort_values("razao_social").reset_index(drop=True)
 
 # Cabeçalho
