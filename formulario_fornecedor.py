@@ -11,14 +11,35 @@ st.markdown("""
             background-color: #f5f5f5;
             padding: 2rem;
             border-radius: 10px;
+            max-width: 900px;
+            margin: auto;
         }
         .titulo-formulario {
-            font-size: 26px;
+            font-size: 28px;
             color: #3879bd;
+            font-weight: bold;
+            margin-bottom: 2rem;
+        }
+        .botao-salvar {
+            background-color: #3879bd;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .botao-cancelar {
+            background-color: #ccc;
+            color: black;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
             font-weight: bold;
         }
     </style>
 """, unsafe_allow_html=True)
+
+st.markdown("<div class='formulario-container'>", unsafe_allow_html=True)
 
 st.markdown("<div class='titulo-formulario'>➕ Cadastro de Fornecedor</div>", unsafe_allow_html=True)
 
@@ -40,7 +61,7 @@ with st.form(key="form_fornecedor"):
     dados["inscricao_estadual"] = st.text_input("Inscrição Estadual", value=dados["inscricao_estadual"])
     dados["inscricao_municipal"] = st.text_input("Inscrição Municipal", value=dados["inscricao_municipal"])
     dados["endereco"] = st.text_area("Endereço Completo", value=dados["endereco"])
-    
+
     st.subheader("Contato Geral")
     dados["telefone"] = st.text_input("Telefone Fixo", value=dados["telefone"])
     dados["celular"] = st.text_input("Celular", value=dados["celular"])
@@ -60,7 +81,7 @@ with st.form(key="form_fornecedor"):
     dados["observacoes"] = st.text_area("Observações Adicionais", value=dados["observacoes"])
 
     col1, col2 = st.columns([1, 1])
-    salvar = col1.form_submit_button("💾 Salvar")
+    salvar = col1.form_submit_button("💾 Salvar", type="primary")
     cancelar = col2.form_submit_button("❌ Cancelar")
 
     if salvar:
@@ -75,3 +96,5 @@ with st.form(key="form_fornecedor"):
 
     if cancelar:
         st.switch_page("pages/3_📁_Fornecedores.py")
+
+st.markdown("</div>", unsafe_allow_html=True)
