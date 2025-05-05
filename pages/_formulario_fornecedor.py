@@ -1,3 +1,4 @@
+# _formulario_fornecedor.py (dentro da pasta pages/)
 import streamlit as st
 import pandas as pd
 from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
@@ -16,15 +17,15 @@ st.markdown("""
             color: #3879bd;
             font-weight: bold;
         }
+        section[data-testid="stSidebar"] ul li a[href*="_formulario_fornecedor"] {
+            display: none;
+        }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown("<div class='titulo-formulario'>➕ Cadastro de Fornecedor</div>", unsafe_allow_html=True)
 
-# Carrega dados existentes
 fornecedores = carregar_fornecedores()
-
-# Verifica se é edição
 id_editar = st.query_params.get("editar")
 if id_editar is not None:
     id_editar = int(id_editar)
@@ -34,32 +35,32 @@ else:
 
 with st.form(key="form_fornecedor"):
     st.subheader("Dados da Empresa")
-    dados["razao_social"] = st.text_input("Razão Social", value=dados.get("razao_social", ""))
-    dados["nome_fantasia"] = st.text_input("Nome Fantasia", value=dados.get("nome_fantasia", ""))
-    dados["cnpj"] = st.text_input("CNPJ", value=dados.get("cnpj", ""))
-    dados["inscricao_estadual"] = st.text_input("Inscrição Estadual", value=dados.get("inscricao_estadual", ""))
-    dados["inscricao_municipal"] = st.text_input("Inscrição Municipal", value=dados.get("inscricao_municipal", ""))
-    dados["endereco"] = st.text_area("Endereço Completo", value=dados.get("endereco", ""))
+    dados["razao_social"] = st.text_input("Razão Social", value=dados["razao_social"])
+    dados["nome_fantasia"] = st.text_input("Nome Fantasia", value=dados["nome_fantasia"])
+    dados["cnpj"] = st.text_input("CNPJ", value=dados["cnpj"])
+    dados["inscricao_estadual"] = st.text_input("Inscrição Estadual", value=dados["inscricao_estadual"])
+    dados["inscricao_municipal"] = st.text_input("Inscrição Municipal", value=dados["inscricao_municipal"])
+    dados["endereco"] = st.text_area("Endereço Completo", value=dados["endereco"])
 
     st.subheader("Contato Geral")
-    dados["telefone"] = st.text_input("Telefone Fixo", value=dados.get("telefone", ""))
-    dados["celular"] = st.text_input("Celular", value=dados.get("celular", ""))
-    dados["email"] = st.text_input("E-mail", value=dados.get("email", ""))
+    dados["telefone"] = st.text_input("Telefone Fixo", value=dados["telefone"])
+    dados["celular"] = st.text_input("Celular", value=dados["celular"])
+    dados["email"] = st.text_input("E-mail", value=dados["email"])
 
     st.subheader("Condições Comerciais")
-    dados["pedido_minimo"] = st.text_input("Pedido Mínimo", value=dados.get("pedido_minimo", ""))
-    dados["prazo_pagamento"] = st.text_input("Prazo de Pagamento", value=dados.get("prazo_pagamento", ""))
-    dados["formas_pagamento"] = st.text_input("Formas de Pagamento", value=dados.get("formas_pagamento", ""))
-    dados["frete"] = st.text_input("Frete", value=dados.get("frete", ""))
+    dados["pedido_minimo"] = st.text_input("Pedido Mínimo", value=dados["pedido_minimo"])
+    dados["prazo_pagamento"] = st.text_input("Prazo de Pagamento", value=dados["prazo_pagamento"])
+    dados["formas_pagamento"] = st.text_input("Formas de Pagamento", value=dados["formas_pagamento"])
+    dados["frete"] = st.text_input("Frete", value=dados["frete"])
 
     st.subheader("Responsável / Vendedor")
-    dados["responsavel_nome"] = st.text_input("Nome do Responsável/Vendedor", value=dados.get("responsavel_nome", ""))
-    dados["responsavel_telefone"] = st.text_input("Telefone do Responsável", value=dados.get("responsavel_telefone", ""))
-    dados["responsavel_email"] = st.text_input("E-mail do Responsável", value=dados.get("responsavel_email", ""))
+    dados["responsavel_nome"] = st.text_input("Nome do Responsável/Vendedor", value=dados["responsavel_nome"])
+    dados["responsavel_telefone"] = st.text_input("Telefone do Responsável", value=dados["responsavel_telefone"])
+    dados["responsavel_email"] = st.text_input("E-mail do Responsável", value=dados["responsavel_email"])
 
-    dados["observacoes"] = st.text_area("Observações Adicionais", value=dados.get("observacoes", ""))
+    dados["observacoes"] = st.text_area("Observações Adicionais", value=dados["observacoes"])
 
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1])
     salvar = col1.form_submit_button("💾 Salvar")
     cancelar = col2.form_submit_button("❌ Cancelar")
 
