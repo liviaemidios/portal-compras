@@ -1,10 +1,10 @@
-# pages/_formulario_fornecedor.py
 import streamlit as st
 import pandas as pd
 from dados_fornecedores import carregar_fornecedores, salvar_fornecedores
 
 st.set_page_config(page_title="Cadastro de Fornecedor", layout="wide")
 
+# Estilo visual
 st.markdown("""
     <style>
         .formulario-container {
@@ -19,13 +19,19 @@ st.markdown("""
             font-weight: bold;
             margin-bottom: 1rem;
         }
+        section[data-testid="stSidebar"] ul li a[href*="_formulario_fornecedor"] {
+            display: none;
+        }
     </style>
 """, unsafe_allow_html=True)
 
+# Título
 st.markdown("<div class='titulo-formulario'>➕ Cadastro de Fornecedor</div>", unsafe_allow_html=True)
 
+# Carrega fornecedores
 fornecedores = carregar_fornecedores()
 
+# Verifica se é edição
 id_editar = st.query_params.get("editar")
 if id_editar is not None:
     id_editar = int(id_editar)
@@ -33,6 +39,7 @@ if id_editar is not None:
 else:
     dados = {col: "" for col in fornecedores.columns}
 
+# Formulário
 with st.form("form_fornecedor"):
     st.subheader("Dados da Empresa")
     dados["razao_social"] = st.text_input("Razão Social", value=dados["razao_social"])
@@ -72,7 +79,7 @@ with st.form("form_fornecedor"):
             fornecedores = pd.concat([fornecedores, novo_df], ignore_index=True)
         salvar_fornecedores(fornecedores)
         st.success("Fornecedor salvo com sucesso!")
-        st.switch_page("pages/3_📁_Fornecedores.py")
+        st.switch_page("3_📁_Fornecedores.py")
 
     if cancelar:
-        st.switch_page("pages/3_📁_Fornecedores.py")
+        st.switch_page("3_📁_Fornecedores.py")
